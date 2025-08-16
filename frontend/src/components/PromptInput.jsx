@@ -6,7 +6,7 @@ import {
   Play,
   Lightbulb,
   Palette,
-  Vintage,
+  Camera,
   Zap,
   Focus,
   RotateCw,
@@ -34,7 +34,7 @@ const PromptInput = ({
         text: "make this look vintage with sepia tones and film grain",
         description:
           "Classic vintage aesthetic with warm brown tones and authentic film texture",
-        icon: Vintage,
+        icon: Camera,
         color: "from-amber-500 to-orange-500",
       },
       {
@@ -87,7 +87,7 @@ const PromptInput = ({
       {
         text: "add film grain and vignette for an artistic look",
         description: "Professional film texture with focused edges",
-        icon: Vintage,
+        icon: Camera,
         color: "from-gray-500 to-gray-700",
       },
       {
