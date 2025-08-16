@@ -4,7 +4,7 @@ import {
   Search,
   Filter,
   Palette,
-  Blur,
+  CircleDot,
   Sparkles,
   Move,
   Sun,
@@ -13,9 +13,9 @@ import {
   Sliders,
   Focus,
   Zap,
-  Vintage,
+  Camera,
   PartyPopper,
-  Resize,
+  Expand,
   RotateCw,
   Crop,
   FlipHorizontal,
@@ -34,7 +34,7 @@ const ToolsPage = () => {
   const categories = [
     { id: "all", name: "All Tools", icon: Tag, count: 25 },
     { id: "color", name: "Color", icon: Palette, count: 6 },
-    { id: "filter", name: "Filters", icon: Blur, count: 6 },
+    { id: "filter", name: "Filters", icon: CircleDot, count: 6 },
     { id: "effect", name: "Effects", icon: Sparkles, count: 7 },
     { id: "transform", name: "Transform", icon: Move, count: 6 },
   ];
@@ -151,7 +151,7 @@ const ToolsPage = () => {
       description:
         "Smooth, natural blur effect perfect for backgrounds, depth of field, and dreamy aesthetics.",
       category: "filter",
-      icon: Blur,
+      icon: CircleDot,
       difficulty: "Beginner",
       processingTime: "~3 min",
       examples: [
@@ -236,7 +236,7 @@ const ToolsPage = () => {
       description:
         "Edge-preserving smoothing filter ideal for skin smoothing and noise reduction.",
       category: "filter",
-      icon: Blur,
+      icon: CircleDot,
       difficulty: "Advanced",
       processingTime: "~4 min",
       examples: [
@@ -255,7 +255,7 @@ const ToolsPage = () => {
       description:
         "Classic sepia effect for vintage, nostalgic, and timeless aesthetic appeal.",
       category: "effect",
-      icon: Vintage,
+      icon: Camera,
       difficulty: "Beginner",
       processingTime: "~2 min",
       examples: [
@@ -357,7 +357,7 @@ const ToolsPage = () => {
       description:
         "Simulate cross-processing film technique for unique color shifts and artistic looks.",
       category: "effect",
-      icon: Vintage,
+      icon: Camera,
       difficulty: "Advanced",
       processingTime: "~4 min",
       examples: [
@@ -376,7 +376,7 @@ const ToolsPage = () => {
       description:
         "Scale videos to any resolution while maintaining aspect ratio and preserving quality.",
       category: "transform",
-      icon: Resize,
+      icon: Expand,
       difficulty: "Beginner",
       processingTime: "~2 min",
       examples: [
