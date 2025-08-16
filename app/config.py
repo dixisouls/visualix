@@ -29,13 +29,7 @@ class Settings(BaseSettings):
     temp_dir: Path = Field(default=Path("temp"), env="TEMP_DIR")
     max_file_size: int = Field(default=100 * 1024 * 1024, env="MAX_FILE_SIZE")  # 100MB
     allowed_video_formats: list = ["mp4", "avi", "mov", "wmv", "flv", "webm"]
-    
-    # Redis settings for job queue
-    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
-    
-    # Database settings (optional)
-    database_url: Optional[str] = Field(default=None, env="DATABASE_URL")
-    
+       
     # Processing settings
     max_concurrent_jobs: int = Field(default=5, env="MAX_CONCURRENT_JOBS")
     job_timeout: int = Field(default=3600, env="JOB_TIMEOUT")  # 1 hour
