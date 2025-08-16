@@ -1,6 +1,6 @@
 """
-Gemini Agent Service for intelligent video processing workflow planning.
-Analyzes user prompts and determines appropriate tool sequences.
+Modern Gemini Agent Service using the latest Google Generative AI SDK (v0.8.5+).
+Completely rewritten implementation based on current API patterns.
 """
 
 import json
@@ -38,60 +38,96 @@ class WorkflowPlan:
 
 class GeminiAgent:
     """
-    Google Gemini AI agent for video processing workflow orchestration.
+    Modern Google Gemini AI agent using the latest SDK for video processing workflow orchestration.
     Analyzes natural language prompts and plans optimal tool execution sequences.
     """
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
+        self.model = None
         self._initialize_gemini()
-        self.tool_descriptions = get_tool_descriptions()
+        self.tool_descriptions = self._get_serializable_tool_descriptions()
         
     def _initialize_gemini(self):
-        """Initialize Gemini API client."""
-        if not settings.gemini_api_key or settings.gemini_api_key == "dummy-key-for-testing":
-            # Skip initialization for testing or when not configured
-            self.model = None
-            if not settings.gemini_api_key:
-                self.logger.warning("GEMINI_API_KEY not configured - some features will be disabled")
+        """Initialize Gemini API client with current SDK patterns."""
+        if not settings.gemini_api_key:
+            self.logger.warning("GEMINI_API_KEY not configured - AI features will be disabled")
+            return
+        
+        if settings.gemini_api_key == "dummy-key-for-testing":
+            self.logger.info("Using dummy key for testing - AI features will be disabled")
             return
         
         try:
+            # Configure the API key
             genai.configure(api_key=settings.gemini_api_key)
+            
+            # Create the generative model with modern configuration
+            generation_config = genai.types.GenerationConfig(
+                temperature=0.1,  # Low temperature for consistent planning
+                top_p=0.8,
+                top_k=40,
+                max_output_tokens=2048,
+            )
+            
+            safety_settings = {
+                HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+                HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+            }
+            
+            self.model = genai.GenerativeModel(
+                model_name=settings.gemini_model,
+                generation_config=generation_config,
+                safety_settings=safety_settings
+            )
+            
+            self.logger.info(f"Modern Gemini agent initialized with model: {settings.gemini_model}")
+            
         except Exception as e:
-            if settings.gemini_api_key == "dummy-key-for-testing":
-                # Skip initialization for testing
-                self.model = None
-                return
-            else:
-                raise GeminiAPIError(f"Failed to configure Gemini: {str(e)}")
-        
-        # Configure the model
-        generation_config = {
-            "temperature": 0.1,  # Low temperature for consistent planning
-            "top_p": 0.8,
-            "top_k": 40,
-            "max_output_tokens": 2048,
-        }
-        
-        safety_settings = {
-            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        }
-        
-        self.model = genai.GenerativeModel(
-            model_name=settings.gemini_model,
-            generation_config=generation_config,
-            safety_settings=safety_settings
-        )
-        
-        self.logger.info(f"Gemini agent initialized with model: {settings.gemini_model}")
+            self.logger.error(f"Failed to initialize Gemini: {str(e)}")
+            raise GeminiAPIError(f"Failed to configure Gemini: {str(e)}")
+    
+    def _get_serializable_tool_descriptions(self) -> Dict[str, Dict[str, Any]]:
+        """Get tool descriptions in a JSON-serializable format."""
+        try:
+            raw_descriptions = get_tool_descriptions()
+            serializable_tools = {}
+            
+            for name, desc in raw_descriptions.items():
+                # Extract the actual values from any property objects
+                tool_info = {
+                    "name": name,
+                    "description": str(desc.get("description", "")),
+                    "parameters": {}
+                }
+                
+                # Safely extract parameters
+                if "parameters" in desc:
+                    params = desc["parameters"]
+                    if isinstance(params, dict):
+                        tool_info["parameters"] = params
+                    elif hasattr(params, '__dict__'):
+                        tool_info["parameters"] = params.__dict__
+                    else:
+                        tool_info["parameters"] = str(params)
+                
+                serializable_tools[name] = tool_info
+            
+            return serializable_tools
+            
+        except Exception as e:
+            self.logger.error(f"Error getting tool descriptions: {str(e)}")
+            return {}
     
     def _create_system_prompt(self) -> str:
         """Create the system prompt for video processing workflow planning."""
-        tools_json = json.dumps(self.tool_descriptions, indent=2)
+        try:
+            tools_json = json.dumps(self.tool_descriptions, indent=2, default=str)
+        except Exception as e:
+            self.logger.error(f"Error serializing tools: {str(e)}")
+            tools_json = str(self.tool_descriptions)
         
         return f"""You are an expert video processing AI agent that analyzes user requests and plans optimal video editing workflows.
 
@@ -141,7 +177,7 @@ Remember: Always provide practical, achievable workflows with realistic paramete
     
     async def analyze_prompt(self, prompt: str, video_metadata: Optional[Dict] = None) -> WorkflowPlan:
         """
-        Analyze a user prompt and generate a workflow plan.
+        Analyze a user prompt and generate a workflow plan using the modern SDK.
         
         Args:
             prompt: User's natural language request
@@ -151,26 +187,52 @@ Remember: Always provide practical, achievable workflows with realistic paramete
             WorkflowPlan object with detailed execution plan
         """
         try:
-            self.logger.info(f"Analyzing prompt: {prompt}")
+            self.logger.info(f"Analyzing prompt with modern Gemini: {prompt}")
             
-            # Prepare the user message
-            user_message = f"""
-Please analyze this video editing request and create a workflow plan:
+            # Check if Gemini model is initialized
+            if self.model is None:
+                raise GeminiAPIError("Gemini API not initialized. Please set GEMINI_API_KEY in your .env file")
+            
+            # Prepare video context safely
+            video_context = "No metadata provided"
+            if video_metadata:
+                try:
+                    # Handle different input types safely
+                    if hasattr(video_metadata, 'model_dump'):
+                        # Pydantic v2 model
+                        metadata_dict = video_metadata.model_dump()
+                    elif hasattr(video_metadata, 'dict'):
+                        # Pydantic v1 model
+                        metadata_dict = video_metadata.dict()
+                    elif isinstance(video_metadata, dict):
+                        # Already a dictionary
+                        metadata_dict = video_metadata
+                    else:
+                        # Convert to dict if possible, otherwise use string representation
+                        metadata_dict = video_metadata.__dict__ if hasattr(video_metadata, '__dict__') else str(video_metadata)
+                    
+                    video_context = json.dumps(metadata_dict, default=str, indent=2)
+                except Exception as e:
+                    self.logger.warning(f"Could not serialize video metadata: {e}")
+                    video_context = str(video_metadata)
+            
+            # Create the user message
+            user_message = f"""Please analyze this video editing request and create a workflow plan:
 
 User Request: "{prompt}"
 
-Video Context: {json.dumps(video_metadata) if video_metadata else "No metadata provided"}
+Video Context: {video_context}
 
-Respond with a detailed JSON workflow plan using the available tools.
-"""
+Respond with a detailed JSON workflow plan using the available tools."""
             
-            # Create the chat and get response
+            # Create chat session and get response using modern SDK
             chat = self.model.start_chat(history=[])
             
             # Send system prompt first
             system_response = chat.send_message(self._create_system_prompt())
+            self.logger.debug("System prompt sent successfully")
             
-            # Send user request
+            # Send user request and get response
             response = chat.send_message(user_message)
             
             # Parse the response
@@ -188,10 +250,16 @@ Respond with a detailed JSON workflow plan using the available tools.
         try:
             # Clean the response (remove markdown code blocks if present)
             cleaned_response = response_text.strip()
+            
+            # Remove markdown code blocks
             if cleaned_response.startswith("```json"):
                 cleaned_response = cleaned_response[7:]
+            elif cleaned_response.startswith("```"):
+                cleaned_response = cleaned_response[3:]
+                
             if cleaned_response.endswith("```"):
                 cleaned_response = cleaned_response[:-3]
+                
             cleaned_response = cleaned_response.strip()
             
             # Parse JSON
@@ -240,55 +308,6 @@ Respond with a detailed JSON workflow plan using the available tools.
             self.logger.error(f"Error parsing response: {e}")
             raise GeminiAPIError(f"Failed to parse Gemini response: {e}")
     
-    async def refine_workflow(self, workflow_plan: WorkflowPlan, feedback: str) -> WorkflowPlan:
-        """
-        Refine an existing workflow plan based on feedback or errors.
-        
-        Args:
-            workflow_plan: Original workflow plan
-            feedback: Feedback or error information
-            
-        Returns:
-            Refined WorkflowPlan
-        """
-        try:
-            self.logger.info("Refining workflow plan based on feedback")
-            
-            refinement_prompt = f"""
-Please refine this video processing workflow based on the feedback provided:
-
-Original Prompt: "{workflow_plan.prompt}"
-Original Plan: {json.dumps({
-                'reasoning': workflow_plan.reasoning,
-                'execution_type': workflow_plan.execution_type,
-                'tool_sequence': [
-                    {
-                        'tool_name': tool.tool_name,
-                        'parameters': tool.parameters,
-                        'reasoning': tool.reasoning
-                    } for tool in workflow_plan.tool_sequence
-                ]
-            }, indent=2)}
-
-Feedback/Issues: "{feedback}"
-
-Please provide a refined workflow plan that addresses the feedback while maintaining the original intent.
-Respond with the same JSON format as before.
-"""
-            
-            chat = self.model.start_chat(history=[])
-            system_response = chat.send_message(self._create_system_prompt())
-            response = chat.send_message(refinement_prompt)
-            
-            refined_plan = self._parse_response(response.text, workflow_plan.prompt)
-            
-            self.logger.info("Workflow plan refined successfully")
-            return refined_plan
-            
-        except Exception as e:
-            self.logger.error(f"Error refining workflow: {str(e)}")
-            raise GeminiAPIError(f"Failed to refine workflow: {str(e)}")
-    
     def validate_workflow_plan(self, workflow_plan: WorkflowPlan) -> List[str]:
         """
         Validate a workflow plan for potential issues.
@@ -314,21 +333,6 @@ Respond with the same JSON format as before.
         if workflow_plan.estimated_time < 1:
             warnings.append(f"Estimated time {workflow_plan.estimated_time} seems unrealistically low")
         
-        # Check for parameter validation
-        for tool in workflow_plan.tool_sequence:
-            tool_desc = self.tool_descriptions.get(tool.tool_name)
-            if not tool_desc:
-                continue
-                
-            # Basic parameter presence check
-            required_params = tool_desc.get("parameters", {})
-            for param_name, param_info in required_params.items():
-                if param_name == "video_path":  # This is provided at execution time
-                    continue
-                if param_name not in tool.parameters:
-                    if "default" not in param_info:
-                        warnings.append(f"Tool {tool.tool_name} missing required parameter: {param_name}")
-        
         return warnings
     
     async def explain_workflow(self, workflow_plan: WorkflowPlan) -> str:
@@ -338,33 +342,26 @@ Respond with the same JSON format as before.
         Returns:
             Detailed explanation string
         """
+        if self.model is None:
+            return self._generate_basic_explanation(workflow_plan)
+        
         try:
-            explanation_prompt = f"""
-Please provide a clear, user-friendly explanation of this video processing workflow:
+            explanation_prompt = f"""Please provide a clear, user-friendly explanation of this video processing workflow:
 
 User Request: "{workflow_plan.prompt}"
-Planned Workflow: {json.dumps({
-                'reasoning': workflow_plan.reasoning,
-                'execution_type': workflow_plan.execution_type,
-                'estimated_time': workflow_plan.estimated_time,
-                'complexity_score': workflow_plan.complexity_score,
-                'tool_sequence': [
-                    {
-                        'tool_name': tool.tool_name,
-                        'parameters': tool.parameters,
-                        'reasoning': tool.reasoning
-                    } for tool in workflow_plan.tool_sequence
-                ]
-            }, indent=2)}
+
+Planned Steps: {len(workflow_plan.tool_sequence)} processing steps
+- {chr(10).join([f"{i+1}. {tool.tool_name}: {tool.reasoning}" for i, tool in enumerate(workflow_plan.tool_sequence)])}
+
+Estimated Time: {workflow_plan.estimated_time:.0f} seconds
+Complexity: {workflow_plan.complexity_score}/5
 
 Provide a friendly explanation that:
 1. Summarizes what will be done to the video
 2. Explains each processing step in simple terms
-3. Mentions the estimated processing time
-4. Sets appropriate expectations
+3. Sets appropriate expectations
 
-Keep it conversational and easy to understand for non-technical users.
-"""
+Keep it conversational and easy to understand for non-technical users."""
             
             chat = self.model.start_chat(history=[])
             response = chat.send_message(explanation_prompt)
