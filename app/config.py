@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     
     # Google Gemini API settings
     gemini_api_key: Optional[str] = Field(default=None, env="GEMINI_API_KEY")
-    gemini_model: str = Field(default="gemini-pro", env="GEMINI_MODEL")
+    gemini_model: str = Field(default="gemini-2.5-flash-lite", env="GEMINI_MODEL")
     
     # File storage settings
     upload_dir: Path = Field(default=Path("uploads"), env="UPLOAD_DIR")
