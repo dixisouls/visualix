@@ -29,7 +29,7 @@ class VideoProcessorService:
     
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.workflow_engine = SimpleWorkflowEngine()
+        self.workflow_engine = SimpleWorkflowEngine(video_processor=self)
         
         # In-memory job storage (in production, use database)
         self.jobs: Dict[str, JobInfo] = {}
@@ -200,9 +200,8 @@ class VideoProcessorService:
             if not job:
                 raise ValueError(f"Job {job_id} not found")
             
-            # Update job with prompt
+            # Update job with prompt (status already set to processing by endpoint)
             job.prompt = prompt
-            await self.update_job_status(job_id, JobStatus.PROCESSING, progress=0)
             
             # Get video path from job metadata
             # In this simplified version, we assume video path is stored

@@ -7,6 +7,12 @@ const CleanupHandler = () => {
 
   useEffect(() => {
     const cleanup = async () => {
+      console.log(
+        "🧹 Cleanup disabled to prevent accidental deletion of completed jobs"
+      );
+      // Only cleanup in very specific cases where user is definitely leaving
+      // and jobs are truly abandoned (not just completed)
+      /*
       try {
         // Clean up current job if it exists and is not completed
         if (currentJob && currentJob.status !== "completed") {
@@ -30,9 +36,14 @@ const CleanupHandler = () => {
       } catch (error) {
         console.error("Cleanup error:", error);
       }
+      */
     };
 
     const handleBeforeUnload = (event) => {
+      // Disabled: Don't cleanup on beforeUnload to prevent deleting completed jobs
+      console.log("🧹 Page unloading - preserving jobs for user safety");
+
+      /*
       // Perform cleanup synchronously (limited by browser)
       if (currentJob && currentJob.status !== "completed") {
         // Use sendBeacon for more reliable cleanup on page unload
@@ -48,10 +59,13 @@ const CleanupHandler = () => {
       // Standard beforeunload handling
       event.preventDefault();
       event.returnValue = "";
+      */
     };
 
     const handleUnload = () => {
-      cleanup();
+      // Disabled: Don't cleanup on unload to prevent deleting completed jobs
+      // cleanup();
+      console.log("Page unloading - preserving all jobs");
     };
 
     const handleVisibilityChange = () => {
@@ -77,16 +91,17 @@ const CleanupHandler = () => {
     };
   }, [currentJob, jobHistory]);
 
-  // Also handle cleanup when the app is about to be unmounted
+  // Disabled: Don't auto-cleanup on component unmount to prevent deleting completed jobs
+  // The cleanup was being too aggressive and deleting jobs right after completion
+  /*
   useEffect(() => {
     return () => {
-      // This runs when the component unmounts
       if (currentJob && currentJob.status !== "completed") {
-        // Fire-and-forget cleanup
         apiService.deleteJob(currentJob.job_id).catch(console.error);
       }
     };
   }, [currentJob]);
+  */
 
   // Handle cleanup on navigation/route changes
   useEffect(() => {

@@ -157,7 +157,7 @@ async def process_video(
             job_id=request.job_id,
             status="processing",
             progress=0,
-            message=f"Processing started: {request.prompt}",
+            message="AI processing started - sit back and relax!",
             output_url=None,
             workflow_execution=None,
             error=None

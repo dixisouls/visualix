@@ -14,7 +14,7 @@ from app.config import settings
 from app.core.exceptions import VideoProcessingError, OpenCVToolError
 from app.services.gemini_agent import WorkflowPlan, ToolPlan
 from app.tools import get_tool_by_name
-from app.models.video_models import ToolExecution, WorkflowExecution
+from app.models.video_models import ToolExecution, WorkflowExecution, JobStatus
 
 
 class SimpleWorkflowEngine:
@@ -23,9 +23,10 @@ class SimpleWorkflowEngine:
     Executes tool sequences planned by Gemini agent without LangGraph dependency.
     """
     
-    def __init__(self):
+    def __init__(self, video_processor=None):
         self.logger = logging.getLogger(__name__)
         self.active_workflows: Dict[str, dict] = {}
+        self.video_processor = video_processor
         
     async def execute_workflow(
         self, 
@@ -88,6 +89,10 @@ class SimpleWorkflowEngine:
                     self.logger.error(error_msg)
                     
                     workflow_state["status"] = "failed"
+                    
+                    # Update job as failed
+                    if self.video_processor:
+                        await self.video_processor.update_job_status(job_id, JobStatus.FAILED, error_message=error_msg)
                     
                     return WorkflowExecution(
                         workflow_id=job_id,

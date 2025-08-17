@@ -189,20 +189,35 @@ export function JobProvider({ children }) {
       dispatch({ type: JobActions.CLEAR_ERROR });
 
       try {
+        console.log("🔄 Calling API processVideo:", { jobId, prompt });
+
         const result = await apiService.processVideo(jobId, prompt);
 
+        console.log("📡 API Response:", result);
+
+        // Ensure we have the essential fields for immediate status update
         const updatedJob = {
           ...state.currentJob,
-          ...result,
+          job_id: result.job_id || jobId,
+          status: result.status || "processing", // Ensure status is set
+          progress: result.progress || 0,
+          message: result.message || "Processing started",
           prompt: prompt,
+          workflow_execution: result.workflow_execution || null,
+          output_url: result.output_url || null,
+          error: result.error || null,
         };
+
+        console.log("🔄 Updating job state:", updatedJob);
 
         dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: updatedJob });
         dispatch({ type: JobActions.ADD_TO_HISTORY, payload: updatedJob });
 
+        console.log("✅ Job state updated successfully");
         toast.success("Processing started!");
         return result;
       } catch (error) {
+        console.error("❌ Process error:", error);
         const errorMessage =
           error.response?.data?.detail || error.message || "Processing failed";
         dispatch({ type: JobActions.SET_ERROR, payload: errorMessage });

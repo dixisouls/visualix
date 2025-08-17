@@ -42,13 +42,20 @@ const ProcessPage = () => {
     clearError,
   } = useJob();
 
+  // Debug current job state
+  console.log("🎬 ProcessPage currentJob:", currentJob);
+
   const [activeTab, setActiveTab] = useState("upload");
   const [prompt, setPrompt] = useState("");
   const [statusPolling, setStatusPolling] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [manualTabSwitch, setManualTabSwitch] = useState(false);
 
-  // Auto-switch tabs based on job state
+  // Auto-switch tabs based on job state (but respect manual switches)
   useEffect(() => {
+    // Don't auto-switch if user manually switched tabs
+    if (manualTabSwitch) return;
+
     if (currentJob) {
       if (currentJob.status === "pending" && !currentJob.prompt) {
         setActiveTab("prompt");
@@ -61,24 +68,37 @@ const ProcessPage = () => {
     } else {
       setActiveTab("upload");
     }
-  }, [currentJob]);
+  }, [currentJob, manualTabSwitch]);
 
-  // Status polling for active jobs
+  // Reset manual tab switch when job changes (new upload)
+  useEffect(() => {
+    if (currentJob && currentJob.status === "pending" && !currentJob.prompt) {
+      setManualTabSwitch(false); // Allow auto-switching for new jobs
+    }
+  }, [currentJob?.job_id]); // Only trigger when job_id changes (new job)
+
+  // Only check status when job might be completed (no more continuous polling)
   useEffect(() => {
     if (currentJob && currentJob.status === "processing") {
-      const pollInterval = setInterval(async () => {
+      // Set a longer interval to just check if processing is complete
+      const checkInterval = setInterval(async () => {
         try {
-          await checkJobStatus(currentJob.job_id);
+          const status = await checkJobStatus(currentJob.job_id);
+          // Only stop polling if job is no longer processing
+          if (status.status !== "processing") {
+            clearInterval(checkInterval);
+            setStatusPolling(null);
+          }
         } catch (error) {
-          console.error("Status polling error:", error);
+          console.error("Status check error:", error);
         }
-      }, 2000); // Poll every 2 seconds
+      }, 5000); // Check every 5 seconds (less frequent)
 
-      setStatusPolling(pollInterval);
+      setStatusPolling(checkInterval);
 
       return () => {
-        if (pollInterval) {
-          clearInterval(pollInterval);
+        if (checkInterval) {
+          clearInterval(checkInterval);
         }
       };
     } else if (statusPolling) {
@@ -95,10 +115,24 @@ const ProcessPage = () => {
     }
 
     try {
-      await processVideo(currentJob.job_id, prompt.trim());
-      setActiveTab("status");
+      console.log("🚀 Starting processing for job:", currentJob.job_id);
+      console.log("📝 Prompt:", prompt.trim());
+
+      // Call processVideo and wait for response
+      const result = await processVideo(currentJob.job_id, prompt.trim());
+
+      console.log("✅ Process response:", result);
+      console.log("📊 Result status:", result.status);
+
+      // Switch to monitor tab after status is confirmed as processing
+      if (result.status === "processing") {
+        console.log("🎯 Switching to status tab - processing confirmed");
+        setActiveTab("status");
+        setManualTabSwitch(true);
+      }
     } catch (error) {
-      console.error("Processing error:", error);
+      console.error("❌ Processing error:", error);
+      setManualTabSwitch(false);
     }
   };
 
@@ -110,6 +144,7 @@ const ProcessPage = () => {
       await deleteJob(currentJob.job_id);
       setPrompt("");
       setActiveTab("upload");
+      setManualTabSwitch(false); // Reset manual switch when job is deleted
       toast.success("Job deleted successfully");
     } catch (error) {
       console.error("Delete error:", error);
@@ -156,11 +191,23 @@ const ProcessPage = () => {
       return tabId === "upload" ? "active" : "disabled";
     }
 
+    console.log("🎯 getTabStatus for", tabId, "- Job:", {
+      status: currentJob.status,
+      hasPrompt: !!currentJob.prompt,
+      prompt: currentJob.prompt,
+    });
+
     switch (tabId) {
       case "upload":
         return "completed";
       case "prompt":
-        if (currentJob.prompt) return "completed";
+        if (currentJob.prompt) {
+          console.log(
+            "✅ Prompt tab should show completed - has prompt:",
+            currentJob.prompt
+          );
+          return "completed";
+        }
         if (currentJob.status === "pending") return "active";
         return "disabled";
       case "status":
@@ -169,6 +216,10 @@ const ProcessPage = () => {
           currentJob.status === "completed" ||
           currentJob.status === "failed"
         ) {
+          console.log(
+            "✅ Status tab should show active - status:",
+            currentJob.status
+          );
           return "active";
         }
         return currentJob.prompt ? "ready" : "disabled";
@@ -258,6 +309,7 @@ const ProcessPage = () => {
                         onClick={() => {
                           if (status !== "disabled") {
                             setActiveTab(tab.id);
+                            setManualTabSwitch(true);
                           }
                         }}
                         disabled={status === "disabled"}
@@ -368,7 +420,10 @@ const ProcessPage = () => {
                       job={currentJob}
                       onDownload={handleDownloadVideo}
                       onDelete={handleDeleteJob}
-                      onRetry={() => setActiveTab("prompt")}
+                      onRetry={() => {
+                        setActiveTab("prompt");
+                        setManualTabSwitch(true);
+                      }}
                     />
                   </motion.div>
                 )}

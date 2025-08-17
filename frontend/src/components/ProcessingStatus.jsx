@@ -25,27 +25,8 @@ import {
 import { apiService } from "../services/api";
 
 const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
-  const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState(null);
-  const [processingStartTime, setProcessingStartTime] = useState(null);
-
-  useEffect(() => {
-    if (job?.status === "processing" && !processingStartTime) {
-      setProcessingStartTime(Date.now());
-    }
-  }, [job?.status]);
-
-  useEffect(() => {
-    if (
-      job?.status === "processing" &&
-      processingStartTime &&
-      job.progress > 0
-    ) {
-      const elapsedTime = (Date.now() - processingStartTime) / 1000;
-      const estimatedTotal = (elapsedTime / job.progress) * 100;
-      const remaining = Math.max(0, estimatedTotal - elapsedTime);
-      setEstimatedTimeRemaining(remaining);
-    }
-  }, [job?.progress, processingStartTime]);
+  // Debug logging
+  console.log("🎬 ProcessingStatus received job:", job);
 
   if (!job) {
     return (
@@ -79,9 +60,8 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
           icon: Loader,
           color: "text-primary-600",
           bgColor: "bg-primary-100",
-          title: "Processing in Progress",
-          description:
-            "Our AI is analyzing your request and applying the selected tools.",
+          title: "AI Processing",
+          description: "Sit back and relax while we work on your video!",
           actionable: false,
         };
       case "completed":
@@ -145,26 +125,63 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         </h3>
         <p className="text-gray-600 mb-4">{statusInfo.description}</p>
 
-        {/* Progress Bar for Processing */}
-        {job.status === "processing" && (
+        {/* Beautiful Spinner for Processing */}
+        {(() => {
+          console.log(
+            "🎪 Checking spinner condition - job.status:",
+            job.status,
+            "=== 'processing':",
+            job.status === "processing"
+          );
+          return job.status === "processing";
+        })() && (
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-md mx-auto mb-4"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center space-y-4 my-8"
           >
-            <div className="progress-bar mb-2">
+            {/* Main Spinner */}
+            <div className="relative">
+              {/* Outer ring */}
               <motion.div
-                className="progress-fill"
-                initial={{ width: 0 }}
-                animate={{ width: `${job.progress || 0}%` }}
-                transition={{ duration: 0.5 }}
+                className="w-16 h-16 border-4 border-primary-200 rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
               />
+              {/* Inner spinning ring */}
+              <motion.div
+                className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-primary-600 rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+              {/* Center dot */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary-600 rounded-full animate-pulse" />
             </div>
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>{job.progress || 0}% complete</span>
-              {estimatedTimeRemaining && (
-                <span>~{Math.ceil(estimatedTimeRemaining)}s remaining</span>
-              )}
+
+            {/* Processing Text */}
+            <div className="text-center">
+              <motion.div
+                className="text-lg font-semibold text-gray-900 mb-2"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                Processing your video...
+              </motion.div>
+              <p className="text-sm text-gray-600">
+                Our AI is working its magic ✨
+              </p>
             </div>
           </motion.div>
         )}
@@ -254,43 +271,105 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         </div>
       </div>
 
-      {/* Current Processing Step */}
+      {/* Enhanced Processing Animation */}
       {job.status === "processing" && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-r from-primary-50 to-purple-50 rounded-xl p-6"
+          className="bg-gradient-to-br from-primary-50 via-purple-50 to-blue-50 rounded-xl p-8 border border-primary-100"
         >
-          <div className="flex items-center space-x-3 mb-3">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-lg flex items-center justify-center"
-            >
-              <Activity className="w-4 h-4 text-white" />
-            </motion.div>
-            <h4 className="font-semibold text-gray-900">
-              AI Processing in Progress
-            </h4>
-          </div>
+          <div className="flex flex-col items-center text-center space-y-6">
+            {/* Large Animated Spinner */}
+            <div className="relative">
+              {/* Background Circle */}
+              <div className="w-24 h-24 border-8 border-gray-200 rounded-full"></div>
 
-          <p className="text-sm text-gray-600 mb-3">
-            {job.message ||
-              "Our AI is analyzing your video and applying the selected processing tools..."}
-          </p>
+              {/* Main Spinning Ring */}
+              <motion.div
+                className="absolute top-0 left-0 w-24 h-24 border-8 border-transparent border-t-primary-500 border-r-primary-500 rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
 
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
-            <div className="flex items-center space-x-1">
-              <Brain className="w-4 h-4" />
-              <span>Gemini AI</span>
+              {/* Secondary Ring */}
+              <motion.div
+                className="absolute top-2 left-2 w-20 h-20 border-4 border-transparent border-t-purple-400 rounded-full"
+                animate={{ rotate: -360 }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+
+              {/* Center Icon */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <motion.div
+                  animate={{ scale: [0.8, 1.1, 0.8] }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center"
+                >
+                  <Sparkles className="w-4 h-4 text-white" />
+                </motion.div>
+              </div>
             </div>
-            <div className="flex items-center space-x-1">
-              <Cpu className="w-4 h-4" />
-              <span>OpenCV Tools</span>
+
+            {/* Processing Messages */}
+            <div className="space-y-3">
+              <motion.h3
+                className="text-2xl font-bold text-gray-900"
+                animate={{ opacity: [0.7, 1, 0.7] }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                AI Processing Your Video
+              </motion.h3>
+
+              <p className="text-gray-600 max-w-md">
+                Our advanced AI is analyzing your video and applying the
+                requested transformations. This may take a few moments...
+              </p>
             </div>
-            <div className="flex items-center space-x-1">
-              <Timer className="w-4 h-4" />
-              <span>Real-time Processing</span>
+
+            {/* Tech Stack Indicators */}
+            <div className="flex items-center space-x-6 pt-4 border-t border-primary-100">
+              <motion.div
+                className="flex items-center space-x-2 text-sm text-gray-600"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 0 }}
+              >
+                <Brain className="w-5 h-5 text-primary-500" />
+                <span>Gemini AI</span>
+              </motion.div>
+
+              <motion.div
+                className="flex items-center space-x-2 text-sm text-gray-600"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+              >
+                <Cpu className="w-5 h-5 text-purple-500" />
+                <span>OpenCV</span>
+              </motion.div>
+
+              <motion.div
+                className="flex items-center space-x-2 text-sm text-gray-600"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+              >
+                <Zap className="w-5 h-5 text-blue-500" />
+                <span>Processing</span>
+              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -376,27 +455,38 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-          className="bg-blue-50 rounded-xl p-4"
+          transition={{ delay: 3 }}
+          className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100"
         >
-          <h4 className="font-semibold text-blue-900 mb-2 flex items-center">
-            <Sparkles className="w-4 h-4 mr-2" />
-            While You Wait...
+          <h4 className="font-semibold text-blue-900 mb-3 flex items-center">
+            <Sparkles className="w-5 h-5 mr-2" />
+            While We Work Our Magic...
           </h4>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Processing time depends on video length and complexity</li>
-            <li>
-              • Our AI automatically optimizes the workflow for best results
-            </li>
-            <li>
-              • You can safely leave this page - processing continues in the
-              background
-            </li>
-            <li>
-              • Higher resolution videos may take longer but produce better
-              results
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800">
+            <div className="flex items-start space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span>AI analyzes your video frame by frame</span>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span>Smart algorithms optimize for best results</span>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span>You can safely navigate away</span>
+            </div>
+            <div className="flex items-start space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span>Processing continues in the background</span>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-white/50 rounded-lg border border-blue-200">
+            <p className="text-xs text-blue-700 font-medium text-center">
+              ☕ Perfect time to grab a coffee! We'll have your video ready
+              soon.
+            </p>
+          </div>
         </motion.div>
       )}
     </div>

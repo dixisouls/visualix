@@ -15,19 +15,20 @@ from app.workflows.simple_workflow import SimpleWorkflowEngine
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# Global service instances
-video_processor = VideoProcessorService()
-workflow_engine = SimpleWorkflowEngine()
+# Global service instances - import from video_api to ensure consistency
+from app.api.video_api import get_video_processor as _get_video_processor
 
 
 def get_video_processor() -> VideoProcessorService:
     """Dependency injection for video processor service."""
-    return video_processor
+    return _get_video_processor()
 
 
 def get_workflow_engine() -> SimpleWorkflowEngine:
     """Dependency injection for workflow engine."""
-    return workflow_engine
+    # Return the workflow engine from the video processor to ensure consistency
+    video_proc = get_video_processor()
+    return video_proc.workflow_engine
 
 
 @router.get("/status/{job_id}", response_model=JobStatusResponse)
@@ -61,7 +62,7 @@ async def get_job_status(
         return JobStatusResponse(
             job_id=job_id,
             status=job_info.status,
-            progress=workflow_status["progress"] if workflow_status else job_info.progress,
+            progress=0,  # No progress updates needed
             message=_get_status_message(job_info, workflow_status),
             output_url=output_url,
             workflow_execution=job_info.workflow_execution,
@@ -254,15 +255,7 @@ def _get_status_message(job_info: JobInfo, workflow_status: Optional[dict]) -> s
         return "Video uploaded and ready for processing"
     
     elif job_info.status == "processing":
-        if workflow_status:
-            current_tool = workflow_status.get("current_tool", 0)
-            total_tools = workflow_status.get("total_tools", 1)
-            if current_tool < total_tools:
-                return f"Processing video (step {current_tool + 1} of {total_tools})..."
-            else:
-                return "Finalizing video processing..."
-        else:
-            return "Processing video..."
+        return "AI is working on your video..."
     
     elif job_info.status == "completed":
         return "Video processing completed successfully"
