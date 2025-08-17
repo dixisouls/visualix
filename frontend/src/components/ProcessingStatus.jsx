@@ -19,7 +19,6 @@ import {
   Timer,
   Cpu,
   ArrowRight,
-  Eye,
   Activity,
 } from "lucide-react";
 import { apiService } from "../services/api";
@@ -426,18 +425,6 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
 
         {/* Secondary Actions */}
         <div className="flex space-x-3">
-          {job.status === "completed" && (
-            <button
-              onClick={() => {
-                /* TODO: Implement preview */
-              }}
-              className="flex-1 btn-ghost py-3 flex items-center justify-center space-x-2"
-            >
-              <Eye className="w-4 h-4" />
-              <span>Preview</span>
-            </button>
-          )}
-
           {job.status !== "processing" && (
             <button
               onClick={onDelete}

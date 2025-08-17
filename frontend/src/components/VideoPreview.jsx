@@ -1,16 +1,7 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  Minimize,
-  Eye,
-  EyeOff,
   Download,
-  Share2,
   FileVideo,
   Monitor,
   Clock,
@@ -22,27 +13,10 @@ import {
 import { apiService } from "../services/api";
 
 const VideoPreview = ({ job }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [previewError, setPreviewError] = useState(null);
-
   if (!job) return null;
 
-  const canPreview = job.status === "completed" && job.output_url;
+  const canDownload = job.status === "completed" && job.output_url;
   const videoMetadata = job.video_metadata;
-
-  const handlePreviewToggle = () => {
-    if (canPreview) {
-      setShowPreview(!showPreview);
-      setPreviewError(null);
-    }
-  };
-
-  const handleVideoError = () => {
-    setPreviewError("Unable to load video preview");
-  };
 
   return (
     <motion.div
@@ -52,28 +26,10 @@ const VideoPreview = ({ job }) => {
     >
       {/* Header */}
       <div className="p-4 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 flex items-center">
-            <FileVideo className="w-5 h-5 mr-2 text-primary-600" />
-            Video Preview
-          </h3>
-
-          {canPreview && (
-            <button
-              onClick={handlePreviewToggle}
-              className={`btn-ghost px-3 py-2 text-sm flex items-center space-x-2 ${
-                showPreview ? "text-primary-600" : ""
-              }`}
-            >
-              {showPreview ? (
-                <EyeOff className="w-4 h-4" />
-              ) : (
-                <Eye className="w-4 h-4" />
-              )}
-              <span>{showPreview ? "Hide" : "Show"}</span>
-            </button>
-          )}
-        </div>
+        <h3 className="font-semibold text-gray-900 flex items-center">
+          <FileVideo className="w-5 h-5 mr-2 text-primary-600" />
+          Video Information
+        </h3>
       </div>
 
       <div className="p-4">
@@ -193,120 +149,33 @@ const VideoPreview = ({ job }) => {
             </div>
           )}
 
-          {job.status === "completed" && !showPreview && (
+          {job.status === "completed" && (
             <div className="text-center py-6">
               <div className="w-16 h-16 bg-success-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <Play className="w-8 h-8 text-success-600" />
+                <Download className="w-8 h-8 text-success-600" />
               </div>
               <p className="text-gray-600 mb-3">Processing complete!</p>
               <button
-                onClick={handlePreviewToggle}
+                onClick={() => {
+                  // Download functionality
+                  const link = document.createElement("a");
+                  link.href = `${
+                    process.env.REACT_APP_API_URL ||
+                    "http://localhost:8000/api/v1"
+                  }${job.output_url}`;
+                  link.download = `${
+                    videoMetadata?.filename?.split(".")[0] || "processed"
+                  }_result.mp4`;
+                  link.click();
+                }}
                 className="btn-primary px-4 py-2 text-sm flex items-center space-x-2 mx-auto"
               >
-                <Eye className="w-4 h-4" />
-                <span>Preview Result</span>
+                <Download className="w-4 h-4" />
+                <span>Download Video</span>
               </button>
             </div>
           )}
         </div>
-
-        {/* Video Preview Player */}
-        <AnimatePresence>
-          {showPreview && canPreview && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mt-4 border-t border-gray-100 pt-4"
-            >
-              <div className="relative bg-black rounded-lg overflow-hidden">
-                {previewError ? (
-                  <div className="aspect-video flex items-center justify-center">
-                    <div className="text-center text-white">
-                      <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-75" />
-                      <p className="text-sm opacity-75">{previewError}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <video
-                      className="w-full aspect-video object-contain"
-                      onError={handleVideoError}
-                      controls
-                      preload="metadata"
-                    >
-                      <source
-                        src={`${
-                          process.env.REACT_APP_API_URL ||
-                          "http://localhost:8000/api/v1"
-                        }${job.output_url}`}
-                        type="video/mp4"
-                      />
-                      Your browser does not support the video tag.
-                    </video>
-
-                    {/* Custom Overlay Controls (if needed) */}
-                    <div className="absolute bottom-4 right-4 flex space-x-2">
-                      <button
-                        onClick={() => setIsFullscreen(!isFullscreen)}
-                        className="bg-black/50 text-white p-2 rounded-lg hover:bg-black/70 transition-colors"
-                      >
-                        {isFullscreen ? (
-                          <Minimize className="w-4 h-4" />
-                        ) : (
-                          <Maximize className="w-4 h-4" />
-                        )}
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Preview Actions */}
-              <div className="flex space-x-2 mt-3">
-                <button
-                  onClick={() => {
-                    // Download functionality
-                    const link = document.createElement("a");
-                    link.href = `${
-                      process.env.REACT_APP_API_URL ||
-                      "http://localhost:8000/api/v1"
-                    }${job.output_url}`;
-                    link.download = `${
-                      videoMetadata?.filename?.split(".")[0] || "processed"
-                    }_result.mp4`;
-                    link.click();
-                  }}
-                  className="flex-1 btn-primary py-2 text-sm flex items-center justify-center space-x-2"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    // Share functionality (could implement sharing to social media, etc.)
-                    if (navigator.share) {
-                      navigator.share({
-                        title: "Processed Video",
-                        text: "Check out my AI-processed video!",
-                        url: window.location.href,
-                      });
-                    } else {
-                      // Fallback: copy link to clipboard
-                      navigator.clipboard.writeText(window.location.href);
-                      alert("Link copied to clipboard!");
-                    }
-                  }}
-                  className="flex-1 btn-ghost py-2 text-sm flex items-center justify-center space-x-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span>Share</span>
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </motion.div>
   );
