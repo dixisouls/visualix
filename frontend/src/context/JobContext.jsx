@@ -48,20 +48,27 @@ function jobReducer(state, action) {
       };
 
     case JobActions.UPDATE_JOB_STATUS:
+      console.log("🔄 REDUCER: UPDATE_JOB_STATUS called with:", action.payload);
       if (
         !state.currentJob ||
         state.currentJob.job_id !== action.payload.job_id
       ) {
+        console.log("🚫 REDUCER: No current job or job ID mismatch");
         return state;
       }
 
-      return {
+      const newState = {
         ...state,
         currentJob: {
           ...state.currentJob,
           ...action.payload,
         },
       };
+      console.log(
+        "✅ REDUCER: Updated job status to:",
+        newState.currentJob.status
+      );
+      return newState;
 
     case JobActions.SET_LOADING:
       return {
@@ -182,7 +189,38 @@ export function JobProvider({ children }) {
     }
   }, []);
 
-  // Start video processing
+  // Submit prompt and prepare for processing (UI-first approach)
+  const submitPrompt = useCallback(
+    (jobId, prompt) => {
+      console.log("📝 Submitting prompt:", { jobId, prompt });
+
+      // Immediately update job state with prompt (UI-first)
+      // Don't change status - keep current status to avoid confusion
+      const updatedJob = {
+        ...state.currentJob,
+        prompt: prompt,
+        message: "Preparing to process...",
+        // Keep current status - don't set back to pending
+      };
+
+      console.log("🔄 Updating job with prompt:", updatedJob);
+      dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: updatedJob });
+      dispatch({ type: JobActions.ADD_TO_HISTORY, payload: updatedJob });
+
+      console.log("✅ Prompt submitted successfully");
+      return updatedJob;
+    },
+    [state.currentJob]
+  );
+
+  // Force immediate status update (for UX responsiveness)
+  const forceStatusUpdate = useCallback((jobUpdate) => {
+    console.log("⚡ FORCING immediate status update:", jobUpdate);
+    dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: jobUpdate });
+    dispatch({ type: JobActions.ADD_TO_HISTORY, payload: jobUpdate });
+  }, []);
+
+  // Start video processing (backend call)
   const processVideo = useCallback(
     async (jobId, prompt) => {
       dispatch({ type: JobActions.SET_LOADING, payload: true });
@@ -195,25 +233,29 @@ export function JobProvider({ children }) {
 
         console.log("📡 API Response:", result);
 
-        // Ensure we have the essential fields for immediate status update
+        // Update job with backend response
         const updatedJob = {
           ...state.currentJob,
           job_id: result.job_id || jobId,
-          status: result.status || "processing", // Ensure status is set
+          status: result.status || "processing",
           progress: result.progress || 0,
           message: result.message || "Processing started",
-          prompt: prompt,
+          prompt: prompt, // Ensure prompt is preserved
           workflow_execution: result.workflow_execution || null,
           output_url: result.output_url || null,
           error: result.error || null,
         };
 
         console.log("🔄 Updating job state:", updatedJob);
+        console.log("🚀 IMMEDIATE STATUS UPDATE:", updatedJob.status);
 
         dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: updatedJob });
         dispatch({ type: JobActions.ADD_TO_HISTORY, payload: updatedJob });
 
-        console.log("✅ Job state updated successfully");
+        console.log(
+          "✅ Job state updated successfully - Status should now be:",
+          updatedJob.status
+        );
         toast.success("Processing started!");
         return result;
       } catch (error) {
@@ -310,6 +352,8 @@ export function JobProvider({ children }) {
 
     // Actions
     uploadVideo,
+    submitPrompt,
+    forceStatusUpdate,
     processVideo,
     checkJobStatus,
     deleteJob,

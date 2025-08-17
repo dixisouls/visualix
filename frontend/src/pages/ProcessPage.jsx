@@ -35,6 +35,8 @@ const ProcessPage = () => {
     currentJob,
     loading,
     error,
+    submitPrompt,
+    forceStatusUpdate,
     processVideo,
     checkJobStatus,
     deleteJob,
@@ -79,13 +81,21 @@ const ProcessPage = () => {
 
   // Only check status when job might be completed (no more continuous polling)
   useEffect(() => {
+    console.log(
+      "🔄 Polling effect triggered - currentJob status:",
+      currentJob?.status
+    );
     if (currentJob && currentJob.status === "processing") {
+      console.log("⏰ Starting status polling for job:", currentJob.job_id);
       // Set a longer interval to just check if processing is complete
       const checkInterval = setInterval(async () => {
         try {
+          console.log("📡 Polling: Checking job status...");
           const status = await checkJobStatus(currentJob.job_id);
+          console.log("📊 Polling: Got status:", status.status);
           // Only stop polling if job is no longer processing
           if (status.status !== "processing") {
+            console.log("🏁 Polling: Job completed, stopping polling");
             clearInterval(checkInterval);
             setStatusPolling(null);
           }
@@ -102,12 +112,13 @@ const ProcessPage = () => {
         }
       };
     } else if (statusPolling) {
+      console.log("🚫 Polling: Clearing existing polling");
       clearInterval(statusPolling);
       setStatusPolling(null);
     }
   }, [currentJob, checkJobStatus]);
 
-  // Handle video processing
+  // Handle video processing - NEW TWO PHASE APPROACH
   const handleProcessVideo = async () => {
     if (!currentJob || !prompt.trim()) {
       toast.error("Please provide processing instructions");
@@ -118,18 +129,41 @@ const ProcessPage = () => {
       console.log("🚀 Starting processing for job:", currentJob.job_id);
       console.log("📝 Prompt:", prompt.trim());
 
-      // Call processVideo and wait for response
+      // PHASE 1: Submit prompt (immediate UI update)
+      console.log("📝 Phase 1: Submitting prompt for UI update");
+      const updatedJob = submitPrompt(currentJob.job_id, prompt.trim());
+
+      // Give a brief moment for the UI to show describe tab as completed
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Switch to monitor tab
+      console.log("🎯 Switching to status tab - prompt submitted");
+      setActiveTab("status");
+      setManualTabSwitch(true);
+
+      // PHASE 2: Start actual backend processing (no delay)
+      console.log("🔄 Phase 2: Starting backend processing immediately");
+
+      // FORCE immediate UI update to "processing" before API call
+      console.log("⚡ FORCING immediate status to 'processing' for better UX");
+      const forceProcessingState = {
+        ...currentJob,
+        status: "processing",
+        message: "AI processing started - sit back and relax!",
+        prompt: prompt.trim(),
+      };
+
+      // Force immediate UI update
+      forceStatusUpdate(forceProcessingState);
+
+      // Give UI time to update
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       const result = await processVideo(currentJob.job_id, prompt.trim());
 
       console.log("✅ Process response:", result);
       console.log("📊 Result status:", result.status);
-
-      // Switch to monitor tab after status is confirmed as processing
-      if (result.status === "processing") {
-        console.log("🎯 Switching to status tab - processing confirmed");
-        setActiveTab("status");
-        setManualTabSwitch(true);
-      }
+      console.log("🎯 Expected: processing, Actual:", result.status);
     } catch (error) {
       console.error("❌ Processing error:", error);
       setManualTabSwitch(false);

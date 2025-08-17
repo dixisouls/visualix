@@ -26,6 +26,7 @@ import { apiService } from "../services/api";
 const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
   // Debug logging
   console.log("🎬 ProcessingStatus received job:", job);
+  console.log("🔍 Job status:", job?.status, "| Has prompt:", !!job?.prompt);
 
   if (!job) {
     return (
@@ -44,8 +45,25 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
   }
 
   const getStatusInfo = () => {
+    console.log(
+      "🎯 ProcessingStatus getStatusInfo - status:",
+      job.status,
+      "prompt:",
+      job.prompt
+    );
     switch (job.status) {
       case "pending":
+        // If job has prompt but status is pending, show "preparing" instead of "ready"
+        if (job.prompt) {
+          return {
+            icon: Clock,
+            color: "text-blue-600",
+            bgColor: "bg-blue-100",
+            title: "Preparing to Process",
+            description: "Initializing AI processing pipeline...",
+            actionable: false,
+          };
+        }
         return {
           icon: Clock,
           color: "text-warning-600",

@@ -78,10 +78,26 @@ export const apiService = {
   },
 
   async processVideo(jobId, prompt) {
+    console.log("🌐 API: Calling processVideo with:", { jobId, prompt });
+    const startTime = Date.now();
+
     const response = await api.post("/video/process", {
       job_id: jobId,
       prompt: prompt,
     });
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+
+    console.log("📡 API: processVideo response:", response.data);
+    console.log("🔍 API: Response status:", response.data.status);
+    console.log("⏱️ API: Call duration:", duration + "ms");
+
+    if (duration > 5000) {
+      console.warn(
+        "⚠️ API: processVideo took longer than 5 seconds - this might be the issue!"
+      );
+    }
 
     return response.data;
   },
