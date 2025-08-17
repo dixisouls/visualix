@@ -113,28 +113,223 @@
         -moz-osx-font-smoothing: grayscale;
       }
 
-      /* Loading animation */
+      /* Modern AI-style Loading Screen */
       .loading-screen {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
+        background: linear-gradient(
+          135deg,
+          #f8fafc 0%,
+          #f1f5f9 25%,
+          #e2e8f0 50%,
+          #f8fafc 75%,
+          #ffffff 100%
+        );
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 9999;
         transition: opacity 0.5s ease-out;
+        overflow: hidden;
       }
 
-      .loading-spinner {
-        width: 60px;
-        height: 60px;
-        border: 4px solid #e5e7eb;
-        border-top: 4px solid #0ea5e9;
+      /* Animated background waves */
+      .loading-screen::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            circle at 20% 50%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 80%,
+            rgba(120, 119, 198, 0.2) 0%,
+            transparent 50%
+          );
+        animation: waves 8s ease-in-out infinite;
+      }
+
+      @keyframes waves {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 0.8;
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+          opacity: 1;
+        }
+      }
+
+      /* Stars container */
+      .stars-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      /* Individual stars */
+      .star {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: linear-gradient(45deg, #fff, #e0aaff, #c77dff, #9d4edd);
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.8),
+          0 0 12px rgba(192, 132, 252, 0.6);
+      }
+
+      .star:nth-child(1) {
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+        animation-duration: 6s;
+      }
+      .star:nth-child(2) {
+        top: 15%;
+        left: 20%;
+        animation-delay: 1s;
+        animation-duration: 8s;
+      }
+      .star:nth-child(3) {
+        top: 30%;
+        left: 70%;
+        animation-delay: 2s;
+        animation-duration: 7s;
+      }
+      .star:nth-child(4) {
+        top: 50%;
+        left: 15%;
+        animation-delay: 0.5s;
+        animation-duration: 9s;
+      }
+      .star:nth-child(5) {
+        top: 80%;
+        left: 30%;
+        animation-delay: 3s;
+        animation-duration: 6s;
+      }
+      .star:nth-child(6) {
+        top: 70%;
+        left: 80%;
+        animation-delay: 1.5s;
+        animation-duration: 8s;
+      }
+      .star:nth-child(7) {
+        top: 10%;
+        left: 80%;
+        animation-delay: 2.5s;
+        animation-duration: 7s;
+      }
+      .star:nth-child(8) {
+        top: 40%;
+        left: 90%;
+        animation-delay: 4s;
+        animation-duration: 5s;
+      }
+      .star:nth-child(9) {
+        top: 60%;
+        left: 60%;
+        animation-delay: 3.5s;
+        animation-duration: 7s;
+      }
+      .star:nth-child(10) {
+        top: 90%;
+        left: 70%;
+        animation-delay: 5s;
+        animation-duration: 6s;
+      }
+      .star:nth-child(11) {
+        top: 25%;
+        left: 50%;
+        animation-delay: 1s;
+        animation-duration: 8s;
+      }
+      .star:nth-child(12) {
+        top: 75%;
+        left: 10%;
+        animation-delay: 4.5s;
+        animation-duration: 9s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) scale(1);
+          opacity: 0.7;
+        }
+        50% {
+          transform: translateY(-20px) scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      /* Loading content container */
+      .loading-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+      }
+
+      /* Central loading animation */
+      .loading-orb {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 40px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .orb-outer {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border: 2px solid transparent;
+        border-top: 2px solid #e0aaff;
+        border-right: 2px solid #c77dff;
+        border-radius: 50%;
+        animation: spin 3s linear infinite;
+      }
+
+      .orb-middle {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border: 2px solid transparent;
+        border-top: 2px solid #9d4edd;
+        border-left: 2px solid #7c3aed;
+        border-radius: 50%;
+        animation: spin 2s linear infinite reverse;
+      }
+
+      .orb-inner {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(45deg, #e0aaff, #c77dff, #9d4edd);
+        border-radius: 50%;
+        animation: pulse 2s ease-in-out infinite;
+        box-shadow: 0 0 20px rgba(224, 170, 255, 0.8);
       }
 
       @keyframes spin {
@@ -146,11 +341,83 @@
         }
       }
 
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.2);
+          opacity: 0.8;
+        }
+      }
+
+      /* Loading text */
       .loading-text {
-        margin-top: 20px;
-        color: #6b7280;
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        background: linear-gradient(45deg, #1e293b, #7c3aed, #9d4edd);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: textGlow 3s ease-in-out infinite;
+      }
+
+      .loading-subtitle {
+        color: rgba(71, 85, 105, 0.8);
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 400;
+        opacity: 0.9;
+      }
+
+      @keyframes textGlow {
+        0%,
+        100% {
+          text-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+        }
+        50% {
+          text-shadow: 0 0 20px rgba(124, 58, 237, 0.5),
+            0 0 30px rgba(157, 78, 221, 0.3);
+        }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .loading-orb {
+          width: 80px;
+          height: 80px;
+        }
+
+        .orb-outer {
+          width: 80px;
+          height: 80px;
+        }
+
+        .orb-middle {
+          width: 60px;
+          height: 60px;
+        }
+
+        .orb-inner {
+          width: 30px;
+          height: 30px;
+        }
+
+        .loading-text {
+          font-size: 20px;
+        }
+
+        .loading-subtitle {
+          font-size: 14px;
+        }
+
+        .star {
+          width: 3px;
+          height: 3px;
+        }
       }
     </style>
   </head>
@@ -168,9 +435,31 @@
 
     <!-- Loading Screen -->
     <div id="loading-screen" class="loading-screen">
-      <div style="text-align: center">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading Visualix...</div>
+      <!-- Animated Stars -->
+      <div class="stars-container">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+      </div>
+
+      <!-- Loading Content -->
+      <div class="loading-content">
+        <div class="loading-orb">
+          <div class="orb-outer"></div>
+          <div class="orb-middle"></div>
+          <div class="orb-inner"></div>
+        </div>
+        <div class="loading-text">Loading Visualix</div>
+        <div class="loading-subtitle">AI-Powered Video Processing</div>
       </div>
     </div>
 
