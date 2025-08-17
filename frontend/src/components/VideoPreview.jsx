@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import {
-  Download,
   FileVideo,
   Monitor,
   Clock,
@@ -15,7 +14,6 @@ import { apiService } from "../services/api";
 const VideoPreview = ({ job }) => {
   if (!job) return null;
 
-  const canDownload = job.status === "completed" && job.output_url;
   const videoMetadata = job.video_metadata;
 
   return (
@@ -151,28 +149,7 @@ const VideoPreview = ({ job }) => {
 
           {job.status === "completed" && (
             <div className="text-center py-6">
-              <div className="w-16 h-16 bg-success-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                <Download className="w-8 h-8 text-success-600" />
-              </div>
-              <p className="text-gray-600 mb-3">Processing complete!</p>
-              <button
-                onClick={() => {
-                  // Download functionality
-                  const link = document.createElement("a");
-                  link.href = `${
-                    process.env.REACT_APP_API_URL ||
-                    "http://localhost:8000/api/v1"
-                  }${job.output_url}`;
-                  link.download = `${
-                    videoMetadata?.filename?.split(".")[0] || "processed"
-                  }_result.mp4`;
-                  link.click();
-                }}
-                className="btn-primary px-4 py-2 text-sm flex items-center space-x-2 mx-auto"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download Video</span>
-              </button>
+              <p className="text-gray-600">Processing complete!</p>
             </div>
           )}
         </div>
