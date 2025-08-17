@@ -91,7 +91,7 @@ const Footer = () => {
                 </div>
               </motion.div>
               <div>
-                <h3 className="text-2xl font-bold text-white">Visualix</h3>
+                <h3 className="text-2xl font-bold text-white">VisualiX</h3>
                 <p className="text-sm text-gray-400">AI Video Editor</p>
               </div>
             </Link>
@@ -172,7 +172,7 @@ const Footer = () => {
 
             {/* Copyright */}
             <div className="flex items-center space-x-1 text-sm text-gray-400">
-              <span>© {currentYear} Visualix. Made with</span>
+              <span>© {currentYear} VisualiX. Made with</span>
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
@@ -195,7 +195,7 @@ const Footer = () => {
           <div className="mt-6 pt-6 border-t border-gray-800">
             <div className="text-center text-xs text-gray-500 space-y-1">
               <p>
-                Visualix is an open-source AI video processing platform. Built
+                VisualiX is an open-source AI video processing platform. Built
                 with React, FastAPI, Google Gemini AI, and OpenCV.
               </p>
               <p>

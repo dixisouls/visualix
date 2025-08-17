@@ -1,6 +1,6 @@
-# Visualix Frontend
+# VisualiX Frontend
 
-A stunning React frontend for the Visualix AI-powered video editing platform.
+A stunning React frontend for the VisualiX AI-powered video editing platform.
 Built with modern web technologies for the smoothest user experience known to
 man.
 

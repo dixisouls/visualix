@@ -211,7 +211,7 @@ const HomePage = () => {
               transition={{ delay: 0.1 }}
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Visualix combines cutting-edge AI with professional video
+              VisualiX combines cutting-edge AI with professional video
               processing tools to make sophisticated editing accessible to
               everyone.
             </motion.p>

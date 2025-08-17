@@ -46,7 +46,7 @@ const Navbar = () => {
             </motion.div>
             <div className="hidden sm:block">
               <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                Visualix
+                VisualiX
               </h1>
               <p className="text-xs text-gray-500 -mt-1">AI Video Editor</p>
             </div>
