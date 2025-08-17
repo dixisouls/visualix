@@ -127,7 +127,7 @@ const Navbar = () => {
           {/* GitHub Link */}
           <div className="hidden md:flex items-center space-x-4">
             <a
-              href="https://github.com/dixisouls"
+              href="https://github.com/dixisouls/visualix"
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-50"
@@ -212,7 +212,7 @@ const Navbar = () => {
 
               {/* Mobile GitHub Link */}
               <a
-                href="https://github.com/dixisouls"
+                href="https://github.com/dixisouls/visualix"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-xl transition-colors mt-4"
