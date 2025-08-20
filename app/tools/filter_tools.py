@@ -35,8 +35,8 @@ class BlurTool(BaseVideoTool):
     
     def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
         strength = kwargs.get('strength', 5)
-        # Ensure odd kernel size
-        kernel_size = strength * 2 + 1
+        # Ensure odd kernel size and integer
+        kernel_size = int(strength) * 2 + 1
         return cv2.blur(frame, (kernel_size, kernel_size))
     
     async def execute(self, video_path: str, **kwargs) -> ToolResult:
@@ -78,7 +78,7 @@ class GaussianBlurTool(BaseVideoTool):
         strength = kwargs.get('strength', 5)
         sigma = kwargs.get('sigma', 0.0)
         
-        kernel_size = strength * 2 + 1
+        kernel_size = int(strength) * 2 + 1
         if sigma == 0.0:
             sigma = strength / 3.0  # Auto sigma
         
@@ -120,7 +120,7 @@ class MotionBlurTool(BaseVideoTool):
         }
     
     def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
-        length = kwargs.get('length', 15)
+        length = int(kwargs.get('length', 15))
         angle = kwargs.get('angle', 0)
         
         # Create motion blur kernel
@@ -223,15 +223,18 @@ class NoiseReductionTool(BaseVideoTool):
         strength = kwargs.get('strength', 3)
         preserve_edges = kwargs.get('preserve_edges', True)
         
+        # Ensure strength is an integer
+        strength = int(strength)
+        
         if preserve_edges:
             # Use bilateral filter to preserve edges
-            d = strength * 2 + 5  # Diameter
-            sigma_color = strength * 20
-            sigma_space = strength * 20
+            d = int(strength * 2 + 5)  # Diameter - must be integer
+            sigma_color = float(strength * 20)
+            sigma_space = float(strength * 20)
             return cv2.bilateralFilter(frame, d, sigma_color, sigma_space)
         else:
             # Use Gaussian blur for simple noise reduction
-            kernel_size = strength * 2 + 1
+            kernel_size = int(strength * 2 + 1)  # Ensure odd integer
             return cv2.GaussianBlur(frame, (kernel_size, kernel_size), 0)
     
     async def execute(self, video_path: str, **kwargs) -> ToolResult:
