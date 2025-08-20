@@ -128,30 +128,43 @@ class BaseVideoTool(ABC):
             # Read video
             cap, properties = self._read_video(video_path)
             
-            # Create video writer
+            # Peek first frame to determine output dimensions after processing
+            ret, first_frame = cap.read()
+            if not ret:
+                raise OpenCVToolError("Could not read the first frame from video")
+            processed_first_frame = self._process_frame(first_frame, **kwargs)
+            out_height, out_width = processed_first_frame.shape[:2]
+            
+            # Create video writer using processed frame dimensions
             writer = self._write_video(
                 output_path,
                 properties['fps'],
-                properties['width'], 
-                properties['height']
+                out_width,
+                out_height
             )
             
             # Process frames
             frame_count = 0
+            
+            # Write the first processed frame
+            writer.write(processed_first_frame)
+            frame_count = 1
+            if frame_count % 30 == 0 and properties['frame_count'] > 0:
+                progress = (frame_count / properties['frame_count']) * 100
+                self.logger.info(f"Processing progress: {progress:.1f}%")
+            
+            # Continue with remaining frames
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
                 
-                # Process frame using tool-specific logic
                 processed_frame = self._process_frame(frame, **kwargs)
-                
-                # Write frame
                 writer.write(processed_frame)
                 frame_count += 1
                 
                 # Log progress periodically
-                if frame_count % 30 == 0:  # Every 30 frames
+                if frame_count % 30 == 0 and properties['frame_count'] > 0:
                     progress = (frame_count / properties['frame_count']) * 100
                     self.logger.info(f"Processing progress: {progress:.1f}%")
             
