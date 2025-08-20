@@ -403,7 +403,7 @@ const HomePage = () => {
               </Link>
 
               <a
-                href="https://github.com/dixisouls"
+                href="https://github.com/dixisouls/visualix"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center"
