@@ -2,7 +2,7 @@
 
 A sophisticated video processing application that uses Google Gemini AI to
 analyze natural language prompts and orchestrate OpenCV operations through
-LangGraph workflows.
+custom agentic workflows.
 
 ## 🚀 Features
 
@@ -11,7 +11,7 @@ LangGraph workflows.
   tools
 - **Comprehensive Video Processing**: 25+ OpenCV tools for effects, filters, and
   transformations
-- **LangGraph Orchestration**: Advanced workflow management with state tracking
+- **Custom Workflow Orchestration**: Advanced workflow management with state tracking
 - **Real-time Progress Tracking**: Monitor job status and progress
 - **RESTful API**: Complete FastAPI-based backend with comprehensive endpoints
 
@@ -186,24 +186,24 @@ The AI understands natural language descriptions:
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   FastAPI       │    │   Gemini Agent   │    │   LangGraph     │
+│   FastAPI       │    │   Gemini Agent   │    │   Custom        │
 │   Endpoints     │───▶│   Prompt         │───▶│   Workflow      │
 │                 │    │   Analysis       │    │   Engine        │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                                                │
-         ▼                                                ▼
-┌─────────────────┐                              ┌─────────────────┐
-│   Video         │                              │   OpenCV        │
-│   Storage       │                              │   Tools         │
-│                 │                              │   (25+ tools)   │
-└─────────────────┘                              └─────────────────┘
+         │                                              │
+         ▼                                              ▼
+┌─────────────────┐                            ┌─────────────────┐
+│   Video         │                            │   OpenCV        │
+│   Storage       │                            │   Tools         │
+│                 │                            │   (25+ tools)   │
+└─────────────────┘                            └─────────────────┘
 ```
 
 ### Core Components
 
 1. **FastAPI Backend**: RESTful API with comprehensive endpoints
 2. **Gemini Agent**: AI-powered prompt analysis and workflow planning
-3. **LangGraph Engine**: State-managed workflow orchestration
+3. **Custom Workflow Engine**: State-managed workflow orchestration
 4. **OpenCV Tools**: 25+ specialized video processing tools
 5. **File Management**: Secure upload/storage/cleanup system
 
@@ -225,7 +225,7 @@ app/
 ├── models/        # Pydantic data models
 ├── services/      # Business logic services
 ├── tools/         # OpenCV tool wrappers
-├── workflows/     # LangGraph workflow definitions
+├── workflows/     # Custom workflow definitions
 ├── storage/       # File management utilities
 └── main.py        # Application entry point
 ```
@@ -288,26 +288,6 @@ The system includes comprehensive error handling:
 - Efficient memory management with frame-by-frame processing
 - Configurable resource limits
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add your enhancements
-4. Include tests for new functionality
-5. Submit a pull request
-
-## 📄 License
-
-[Your License Here]
-
-## 🆘 Support
-
-For issues and questions:
-
-- Check the API documentation at `/docs`
-- Review error messages in the response
-- Enable debug mode for detailed logging
-
 ---
 
-**Built with ❤️ using FastAPI, OpenCV, Google Gemini, and LangGraph**
+**Built using FastAPI, OpenCV, Google Gemini**

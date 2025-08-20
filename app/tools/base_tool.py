@@ -200,15 +200,4 @@ class BaseVideoTool(ABC):
                 execution_time=execution_time,
                 error_message=error_msg
             )
-    
-    def to_langgraph_tool(self):
-        """Convert to LangGraph tool format."""
-        from langchain_core.tools import tool
-        
-        @tool(name=self.name, description=self.description)
-        async def langgraph_tool(video_path: str, **kwargs):
-            """LangGraph tool wrapper."""
-            result = await self.execute(video_path, **kwargs)
-            return result.dict()
-        
-        return langgraph_tool
+

@@ -27,12 +27,8 @@ const Footer = () => {
     technology: [
       { name: "Gemini AI", href: "https://ai.google.dev/", external: true },
       { name: "OpenCV", href: "https://opencv.org/", external: true },
-      {
-        name: "LangGraph",
-        href: "https://langchain-ai.github.io/langgraph/",
-        external: true,
-      },
       { name: "React", href: "https://react.dev/", external: true },
+      { name: "FastAPI", href: "https://fastapi.tiangolo.com/", external: true },
     ],
     resources: [
       { name: "Getting Started", href: "#" },
