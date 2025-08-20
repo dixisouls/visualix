@@ -19,6 +19,7 @@ from app.models.video_models import (
 )
 from app.services.gemini_agent import WorkflowPlan
 from app.workflows.simple_workflow import SimpleWorkflowEngine
+from app.storage.file_manager import FileManager
 
 
 class VideoProcessorService:
@@ -30,6 +31,7 @@ class VideoProcessorService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.workflow_engine = SimpleWorkflowEngine(video_processor=self)
+        self.file_manager = FileManager()
         
         # In-memory job storage (in production, use database)
         self.jobs: Dict[str, JobInfo] = {}
@@ -313,22 +315,8 @@ class VideoProcessorService:
             if not job:
                 return False
             
-            # Delete associated files
-            files_deleted = []
-            
-            # Delete original upload
-            upload_files = list(settings.upload_dir.glob(f"{job_id}_*"))
-            for file_path in upload_files:
-                if file_path.exists():
-                    file_path.unlink()
-                    files_deleted.append(str(file_path))
-            
-            # Delete output file if exists
-            if job.output_path:
-                output_path = Path(job.output_path)
-                if output_path.exists():
-                    output_path.unlink()
-                    files_deleted.append(str(output_path))
+            # Delete all associated files using FileManager
+            files_deleted = self.file_manager.delete_job_files(job_id)
             
             # Remove from jobs dict
             del self.jobs[job_id]
