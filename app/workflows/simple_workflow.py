@@ -90,6 +90,9 @@ class SimpleWorkflowEngine:
                     
                     workflow_state["status"] = "failed"
                     
+                    # Clean up any intermediate files created before failure
+                    await self._cleanup_intermediate_files(executed_tools, current_video_path)
+                    
                     # Update job as failed
                     if self.video_processor:
                         await self.video_processor.update_job_status(job_id, JobStatus.FAILED, error_message=error_msg)
@@ -106,6 +109,9 @@ class SimpleWorkflowEngine:
             # All tools completed successfully
             workflow_state["status"] = "completed"
             total_time = time.time() - start_time
+            
+            # Clean up intermediate files (keep only the final output)
+            await self._cleanup_intermediate_files(executed_tools, current_video_path)
             
             self.logger.info(f"Workflow completed successfully for job {job_id} in {total_time:.2f}s")
             
@@ -124,6 +130,9 @@ class SimpleWorkflowEngine:
             if job_id in self.active_workflows:
                 self.active_workflows[job_id]["status"] = "failed"
             
+            # Clean up any intermediate files created before exception
+            await self._cleanup_intermediate_files(executed_tools, current_video_path)
+            
             return WorkflowExecution(
                 workflow_id=job_id,
                 gemini_reasoning=workflow_plan.reasoning,
@@ -137,6 +146,50 @@ class SimpleWorkflowEngine:
             # Cleanup workflow state
             if job_id in self.active_workflows:
                 del self.active_workflows[job_id]
+
+    async def _cleanup_intermediate_files(self, executed_tools: List[ToolExecution], final_output_path: str):
+        """Clean up intermediate files, keeping only the final output."""
+        import os
+        from pathlib import Path
+        
+        try:
+            intermediate_files = []
+            final_output_path = Path(final_output_path) if final_output_path else None
+            
+            # Collect all intermediate output files
+            for tool_exec in executed_tools:
+                if tool_exec.output_path and tool_exec.status == "success":
+                    output_path = Path(tool_exec.output_path)
+                    
+                    # Determine if this is an intermediate file
+                    is_intermediate = False
+                    if final_output_path:
+                        # If we have a final output, any other file is intermediate
+                        is_intermediate = (output_path != final_output_path)
+                    else:
+                        # If no final output (failed workflow), all outputs are intermediate
+                        is_intermediate = True
+                    
+                    if is_intermediate and output_path.exists():
+                        intermediate_files.append(output_path)
+            
+            # Delete intermediate files
+            deleted_count = 0
+            for file_path in intermediate_files:
+                try:
+                    file_path.unlink()
+                    deleted_count += 1
+                    self.logger.debug(f"Deleted intermediate file: {file_path}")
+                except Exception as e:
+                    self.logger.warning(f"Failed to delete intermediate file {file_path}: {e}")
+            
+            if deleted_count > 0:
+                final_name = final_output_path.name if final_output_path else "none"
+                self.logger.info(f"Cleaned up {deleted_count} intermediate files, kept final output: {final_name}")
+            
+        except Exception as e:
+            self.logger.error(f"Error during intermediate file cleanup: {e}")
+            # Don't raise - cleanup failure shouldn't fail the workflow
     
     async def _execute_tool(
         self, 
