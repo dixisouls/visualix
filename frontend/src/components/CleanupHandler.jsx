@@ -1,124 +1,15 @@
 import { useEffect } from "react";
-import { useJob } from "../context/JobContext";
-import { apiService } from "../services/api";
 
 const CleanupHandler = () => {
-  const { currentJob, jobHistory } = useJob();
-
   useEffect(() => {
-    const cleanup = async () => {
-      console.log(
-        "🧹 Cleanup disabled to prevent accidental deletion of completed jobs"
-      );
-      // Only cleanup in very specific cases where user is definitely leaving
-      // and jobs are truly abandoned (not just completed)
-      /*
-      try {
-        // Clean up current job if it exists and is not completed
-        if (currentJob && currentJob.status !== "completed") {
-          console.log("🧹 Cleaning up current job:", currentJob.job_id);
-          await apiService.deleteJob(currentJob.job_id);
-        }
-
-        // Clean up any pending/processing jobs from history
-        const jobsToCleanup = jobHistory.filter(
-          (job) => job.status === "pending" || job.status === "processing"
-        );
-
-        for (const job of jobsToCleanup) {
-          try {
-            console.log("🧹 Cleaning up job from history:", job.job_id);
-            await apiService.deleteJob(job.job_id);
-          } catch (error) {
-            console.error("Failed to cleanup job:", job.job_id, error);
-          }
-        }
-      } catch (error) {
-        console.error("Cleanup error:", error);
-      }
-      */
-    };
-
-    const handleBeforeUnload = (event) => {
-      // Disabled: Don't cleanup on beforeUnload to prevent deleting completed jobs
-      console.log("🧹 Page unloading - preserving jobs for user safety");
-
-      /*
-      // Perform cleanup synchronously (limited by browser)
-      if (currentJob && currentJob.status !== "completed") {
-        // Use sendBeacon for more reliable cleanup on page unload
-        const data = JSON.stringify({ job_id: currentJob.job_id });
-        navigator.sendBeacon(
-          `${
-            process.env.REACT_APP_API_URL || "http://localhost:8000/api/v1"
-          }/video/upload/${currentJob.job_id}`,
-          data
-        );
-      }
-
-      // Standard beforeunload handling
-      event.preventDefault();
-      event.returnValue = "";
-      */
-    };
-
-    const handleUnload = () => {
-      // Disabled: Don't cleanup on unload to prevent deleting completed jobs
-      // cleanup();
-      console.log("Page unloading - preserving all jobs");
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        // Page is being hidden (user switching tabs, etc.)
-        // We don't cleanup here to avoid interrupting legitimate usage
-        console.log("Page hidden, preserving jobs");
-      }
-    };
-
-    // Handle page refresh/close
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("unload", handleUnload);
-
-    // Handle visibility changes (optional - for more advanced scenarios)
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    // Cleanup on component unmount
+    console.log("🧹 Automatic cleanup service active - all files cleared every hour on the server");
+    
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("unload", handleUnload);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [currentJob, jobHistory]);
-
-  // Disabled: Don't auto-cleanup on component unmount to prevent deleting completed jobs
-  // The cleanup was being too aggressive and deleting jobs right after completion
-  /*
-  useEffect(() => {
-    return () => {
-      if (currentJob && currentJob.status !== "completed") {
-        apiService.deleteJob(currentJob.job_id).catch(console.error);
-      }
-    };
-  }, [currentJob]);
-  */
-
-  // Handle cleanup on navigation/route changes
-  useEffect(() => {
-    const handlePopState = () => {
-      // Handle browser back/forward navigation
-      console.log("Navigation detected");
-      // We don't cleanup on navigation to allow users to navigate while processing
-    };
-
-    window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
+      console.log("🧹 CleanupHandler unmounted");
     };
   }, []);
 
-  // This component doesn't render anything
+  // This component doesn't render anything but logs that automatic cleanup is active
   return null;
 };
 

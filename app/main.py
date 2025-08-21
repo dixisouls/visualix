@@ -35,11 +35,27 @@ async def lifespan(app: FastAPI):
     # TODO: Add Redis connection initialization
     # TODO: Add database initialization if needed
     
+    # Start the hourly cleanup service
+    try:
+        from app.services.cleanup_scheduler import start_cleanup_service
+        await start_cleanup_service()
+        logging.info("Hourly cleanup service started - will clear all files every hour")
+    except Exception as e:
+        logging.error(f"Failed to start cleanup service: {e}")
+    
     logging.info("Application started successfully")
     yield
     
     # Shutdown
     logging.info("Shutting down Visualix application...")
+    
+    # Stop the cleanup service
+    try:
+        from app.services.cleanup_scheduler import stop_cleanup_service
+        await stop_cleanup_service()
+        logging.info("Cleanup service stopped")
+    except Exception as e:
+        logging.error(f"Error stopping cleanup service: {e}")
 
 
 def create_app() -> FastAPI:

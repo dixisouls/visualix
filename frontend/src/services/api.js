@@ -130,6 +130,22 @@ export const apiService = {
     return response.data;
   },
 
+  // Cleanup endpoints
+  async getCleanupStatus() {
+    const response = await api.get("/cleanup/status");
+    return response.data;
+  },
+
+  async triggerManualCleanup() {
+    const response = await api.post("/cleanup/manual");
+    return response.data;
+  },
+
+  async getCleanupInfo() {
+    const response = await api.get("/cleanup/info");
+    return response.data;
+  },
+
   // Job management endpoints
   async getJobStatus(jobId) {
     const response = await api.get(`/jobs/status/${jobId}`);
