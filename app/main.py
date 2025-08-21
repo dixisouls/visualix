@@ -79,9 +79,8 @@ def create_app() -> FastAPI:
     # Add trusted host middleware
     allowed_hosts = ["localhost", "127.0.0.1"]
     if settings.is_production:
-        print("Production environment detected")
         allowed_hosts.extend([
-            "visualix-backend-615fbb23d119.herokuapp.com",
+            settings.middleware_host,
             settings.host
         ])
     else:

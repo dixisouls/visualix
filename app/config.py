@@ -16,7 +16,8 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, env="DEBUG")
     
     # Server settings
-    host: str = Field(default="0.0.0.0", env="HOST")  
+    host: str = Field(default="0.0.0.0", env="HOST")
+    middleware_host: str = Field(default="localhost", env="MIDDLEWARE_HOST")
     port: int = Field(default=8000, env="PORT")
     
     # Google Gemini API settings
@@ -32,7 +33,7 @@ class Settings(BaseSettings):
     
     # Security settings - Simple string approach
     cors_origins: Union[str, List[str]] = Field(
-        default="*", 
+        default="http://localhost:3000,http://127.0.0.1:3000", 
         env="CORS_ORIGINS"
     )
     
