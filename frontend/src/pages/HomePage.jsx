@@ -138,7 +138,7 @@ const HomePage = () => {
             >
               Transform your videos with the power of natural language. Just
               describe what you want, and our AI will orchestrate the perfect
-              editing workflow using 25+ professional tools.
+              editing workflow using 24+ professional tools.
             </motion.p>
 
             {/* CTA Buttons */}
