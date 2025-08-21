@@ -32,10 +32,10 @@ const ToolsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
-    { id: "all", name: "All Tools", icon: Tag, count: 25 },
+    { id: "all", name: "All Tools", icon: Tag, count: 24 },
     { id: "color", name: "Color", icon: Palette, count: 6 },
     { id: "filter", name: "Filters", icon: CircleDot, count: 6 },
-    { id: "effect", name: "Effects", icon: Sparkles, count: 7 },
+    { id: "effect", name: "Effects", icon: Sparkles, count: 6 },
     { id: "transform", name: "Transform", icon: Move, count: 6 },
   ];
 
@@ -351,23 +351,6 @@ const ToolsPage = () => {
       ],
       color: "from-red-500 to-pink-500",
     },
-    {
-      id: "cross_process",
-      name: "Cross Process",
-      description:
-        "Simulate cross-processing film technique for unique color shifts and artistic looks.",
-      category: "effect",
-      icon: Camera,
-      difficulty: "Advanced",
-      processingTime: "~4 min",
-      examples: [
-        "cross process effect",
-        "color shift",
-        "film processing look",
-        "artistic color cast",
-      ],
-      color: "from-yellow-500 to-green-500",
-    },
 
     // Transform Tools
     {
@@ -517,7 +500,7 @@ const ToolsPage = () => {
             transition={{ delay: 0.1 }}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Explore our comprehensive suite of 25+ professional video processing
+            Explore our comprehensive suite of 24+ professional video processing
             tools. Each tool is powered by OpenCV and optimized for quality and
             performance.
           </motion.p>
