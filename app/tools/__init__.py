@@ -6,28 +6,35 @@ from .color_tools import (
     ContrastAdjustTool, 
     SaturationAdjustTool,
     HSVAdjustTool,
-    ColorGradingTool
+    ColorGradingTool,
+    WhiteBalanceTool,
+    CurveAdjustmentTool
 )
 from .filter_tools import (
     BlurTool,
     SharpenTool,
     GaussianBlurTool,
     MotionBlurTool,
-    NoiseReductionTool
+    NoiseReductionTool,
+    UnsharpMaskTool,
+    BilateralFilterTool
 )
 from .effect_tools import (
     VintageEffectTool,
     FilmGrainTool,
     VignetteTool,
     SepiaEffectTool,
-    RetroEffectTool
+    RetroEffectTool,
+    BlackWhiteTool,
+    ColorPopTool
 )
 from .transform_tools import (
     ResizeTool,
     RotateTool,
     CropTool,
     FlipTool,
-    PerspectiveTool
+    PerspectiveTool,
+    StabilizationTool
 )
 
 # Registry of all available tools
@@ -38,6 +45,8 @@ TOOL_REGISTRY = {
     "adjust_saturation": SaturationAdjustTool,
     "adjust_hsv": HSVAdjustTool,
     "color_grading": ColorGradingTool,
+    "white_balance": WhiteBalanceTool,
+    "curve_adjustment": CurveAdjustmentTool,
     
     # Filter tools
     "apply_blur": BlurTool,
@@ -45,6 +54,8 @@ TOOL_REGISTRY = {
     "apply_gaussian_blur": GaussianBlurTool,
     "apply_motion_blur": MotionBlurTool,
     "apply_noise_reduction": NoiseReductionTool,
+    "apply_unsharp_mask": UnsharpMaskTool,
+    "apply_bilateral_filter": BilateralFilterTool,
     
     # Effect tools
     "apply_vintage": VintageEffectTool,
@@ -52,13 +63,16 @@ TOOL_REGISTRY = {
     "add_vignette": VignetteTool,
     "apply_sepia": SepiaEffectTool,
     "apply_retro": RetroEffectTool,
+    "apply_black_white": BlackWhiteTool,
+    "apply_color_pop": ColorPopTool,
     
     # Transform tools
     "resize_video": ResizeTool,
     "rotate_video": RotateTool,
     "crop_video": CropTool,
     "flip_video": FlipTool,
-    "apply_perspective": PerspectiveTool
+    "apply_perspective": PerspectiveTool,
+    "apply_stabilization": StabilizationTool
 }
 
 
