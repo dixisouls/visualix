@@ -1,4 +1,4 @@
-# Visualix - Gemini-Powered Video Editor
+# VisualiX - Gemini-Powered Video Editor
 
 A sophisticated video processing application that uses Google Gemini AI to
 analyze natural language prompts and orchestrate OpenCV operations through
@@ -50,14 +50,13 @@ custom agentic workflows.
 
 - Python 3.8+
 - Google Gemini API Key
-- Redis (optional, for advanced job queuing)
 
 ### 1. Clone and Setup
 
 ```bash
 git clone <repository-url>
 cd visualix
-source venv/bin/activate  # Virtual environment is pre-created
+source venv/bin/activate  # Virtual environment should be pre-created
 ```
 
 ### 2. Install Dependencies
@@ -68,20 +67,15 @@ pip install -r requirements.txt
 
 ### 3. Configuration
 
-Create a `.env` file based on the example:
-
-```bash
-# Copy the example configuration
-cp .env.example .env
-
-# Edit with your settings
-nano .env
-```
+Create a `.env` file:
 
 Required configuration:
 
 ```env
+# Required
 GEMINI_API_KEY=your_gemini_api_key_here
+
+# Optional
 DEBUG=false
 HOST=localhost
 PORT=8000
