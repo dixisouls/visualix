@@ -442,17 +442,17 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         )}
 
         {/* Secondary Actions */}
-        <div className="flex space-x-3">
-          {job.status !== "processing" && (
+        {job.status !== "processing" && (
+          <div className="flex justify-center">
             <button
               onClick={onDelete}
-              className="flex-1 btn-danger py-3 flex items-center justify-center space-x-2"
+              className="text-sm text-gray-500 hover:text-gray-700 transition-colors duration-200 flex items-center space-x-2 py-2"
             >
-              <Trash2 className="w-4 h-4" />
-              <span>Delete</span>
+              <Trash2 className="w-3 h-3" />
+              <span>Delete this job</span>
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Processing Tips */}

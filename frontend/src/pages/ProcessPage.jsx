@@ -556,49 +556,55 @@ const ProcessPage = () => {
             {/* Video Preview */}
             {currentJob && <VideoPreview job={currentJob} />}
 
-            {/* Quick Actions */}
-            {currentJob && (
+            {/* Results Disclaimer */}
+            {currentJob && currentJob.status === "completed" && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6"
+                className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-2xl shadow-lg border border-blue-100 p-6"
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                  <Sparkles className="w-5 h-5 mr-2 text-primary-600" />
-                  Quick Actions
-                </h3>
+                <div>
+                  <div className="w-full">
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2 flex items-center">
+                      <Sparkles className="w-5 h-5 mr-2 text-indigo-600" />
+                      Important: About Your Results
+                    </h4>
+                    <div className="text-gray-700 space-y-2 mb-4">
+                      <p className="text-sm leading-relaxed">
+                        <strong>This is not generative editing.</strong>{" "}
+                        VisualiX uses traditional computer vision and image
+                        processing techniques guided by AI to transform your
+                        original video content.
+                      </p>
+                      <p className="text-sm leading-relaxed text-gray-600">
+                        Results are based on applying filters, effects, and
+                        transformations to your existing footage. The output may
+                        differ from your expectations as AI interpretation can
+                        vary.
+                      </p>
+                    </div>
 
-                <div className="space-y-3">
-                  {currentJob.status === "completed" && (
-                    <button
-                      onClick={handleDownloadVideo}
-                      className="w-full btn-success flex items-center justify-center space-x-2"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Download Video</span>
-                    </button>
-                  )}
-
-                  {currentJob.status === "failed" && (
-                    <button
-                      onClick={() => setActiveTab("prompt")}
-                      className="w-full btn-primary flex items-center justify-center space-x-2"
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      <span>Try Again</span>
-                    </button>
-                  )}
-
-                  {currentJob.status !== "processing" && (
-                    <button
-                      onClick={handleDeleteJob}
-                      className="w-full btn-danger flex items-center justify-center space-x-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      <span>Delete Job</span>
-                    </button>
-                  )}
+                    {/* Key Points */}
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        <span>Original content preserved</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+                        <span>AI-guided processing</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                        <span>Non-generative approach</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <div className="w-1.5 h-1.5 bg-pink-500 rounded-full"></div>
+                        <span>Results may vary</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
