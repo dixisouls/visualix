@@ -3,8 +3,8 @@ Configuration settings for Visualix application.
 """
 
 from pydantic_settings import BaseSettings
-from pydantic import Field
-from typing import Optional, List
+from pydantic import Field, validator
+from typing import Optional, List, Union
 import os
 from pathlib import Path
 
@@ -30,32 +30,34 @@ class Settings(BaseSettings):
     max_file_size: int = Field(default=100 * 1024 * 1024, env="MAX_FILE_SIZE")  # 100MB
     allowed_video_formats: list = ["mp4", "avi", "mov", "wmv", "flv", "webm"]
     
-    # Security settings 
-    cors_origins: List[str] = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"]
+    # Security settings - Simple string approach
+    cors_origins: Union[str, List[str]] = Field(
+        default="http://localhost:3000,http://127.0.0.1:3000", 
+        env="CORS_ORIGINS"
     )
     
     # Production settings
     frontend_url: str = Field(default="http://localhost:3000", env="FRONTEND_URL")
+    
+    @validator('cors_origins', pre=True)
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            # Handle comma-separated string
+            if "," in v:
+                return [origin.strip() for origin in v.split(",")]
+            else:
+                return [v.strip()]
+        return v
     
     class Config:
         env_file = ".env"
         case_sensitive = False
 
     def __post_init__(self):
-        """Create necessary directories and handle environment variable parsing."""
+        """Create necessary directories."""
         self.upload_dir.mkdir(exist_ok=True)
         self.output_dir.mkdir(exist_ok=True)
         self.temp_dir.mkdir(exist_ok=True)
-        
-        # Parse CORS_ORIGINS environment variable
-        cors_env = os.getenv("CORS_ORIGINS")
-        if cors_env:
-            # Handle both single URLs and comma-separated lists
-            if "," in cors_env:
-                self.cors_origins = [origin.strip() for origin in cors_env.split(",")]
-            else:
-                self.cors_origins = [cors_env.strip()]
 
     @property
     def is_production(self) -> bool:
