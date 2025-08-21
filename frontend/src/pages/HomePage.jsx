@@ -45,7 +45,7 @@ const HomePage = () => {
     },
     {
       icon: Settings,
-      title: "25+ Professional Tools",
+      title: "24+ Professional Tools",
       description:
         "Comprehensive suite of color grading, filters, effects, and transform tools for all your video editing needs.",
       color: "from-orange-500 to-red-500",
