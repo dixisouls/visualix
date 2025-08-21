@@ -219,7 +219,6 @@ celerybeat-schedule.*
 *.model
 *.h5
 *.pb
-models/
 checkpoints/
 
 # Google API credentials (additional security)
