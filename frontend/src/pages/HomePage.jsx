@@ -366,7 +366,7 @@ const HomePage = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Settings className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">LangGraph</h3>
+                <h3 className="text-xl font-bold mb-2">Custom Agentic Workflow</h3>
                 <p className="text-gray-300">
                   Intelligent workflow orchestration and state management
                 </p>
