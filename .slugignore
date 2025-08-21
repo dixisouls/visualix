@@ -1,0 +1,7 @@
+frontend/
+README.md
+.DS_Store
+*.md
+.git/
+.gitignore
+run.sh

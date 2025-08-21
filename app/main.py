@@ -72,14 +72,22 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE"],  # More restrictive
         allow_headers=["*"],
     )
     
     # Add trusted host middleware
+    allowed_hosts = ["localhost", "127.0.0.1"]
+    if settings.is_production:
+        allowed_hosts.extend([
+            settings.host
+        ])
+    else:
+        allowed_hosts.append(settings.host)
+    
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=["localhost", "127.0.0.1", settings.host]
+        allowed_hosts=allowed_hosts
     )
     
     # Include API routers

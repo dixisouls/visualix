@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, env="DEBUG")
     
     # Server settings
-    host: str = Field(default="localhost", env="HOST")
+    host: str = Field(default="0.0.0.0", env="HOST")  
     port: int = Field(default=8000, env="PORT")
     
     # Google Gemini API settings
@@ -30,8 +30,14 @@ class Settings(BaseSettings):
     max_file_size: int = Field(default=100 * 1024 * 1024, env="MAX_FILE_SIZE")  # 100MB
     allowed_video_formats: list = ["mp4", "avi", "mov", "wmv", "flv", "webm"]
     
-    # Security settings
-    cors_origins: list = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    # Security settings 
+    cors_origins: list = Field(
+        default=["http://localhost:3000", "http://127.0.0.1:3000"],
+        env="CORS_ORIGINS"
+    )
+    
+    # Production settings
+    frontend_url: str = Field(default="http://localhost:3000", env="FRONTEND_URL")
     
     class Config:
         env_file = ".env"
@@ -42,6 +48,11 @@ class Settings(BaseSettings):
         self.upload_dir.mkdir(exist_ok=True)
         self.output_dir.mkdir(exist_ok=True)
         self.temp_dir.mkdir(exist_ok=True)
+
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production environment."""
+        return not self.debug and self.host != "localhost"
 
 
 # Global settings instance
