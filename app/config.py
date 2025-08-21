@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     
     # Security settings - Simple string approach
     cors_origins: Union[str, List[str]] = Field(
-        default="http://localhost:3000,http://127.0.0.1:3000", 
+        default="*", 
         env="CORS_ORIGINS"
     )
     
