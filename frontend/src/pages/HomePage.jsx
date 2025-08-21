@@ -9,16 +9,15 @@ import {
   Video,
   Wand2,
   ArrowRight,
-  CheckCircle,
-  Code,
   Palette,
   Settings,
   Upload,
   Download,
-  Timer,
+  Film,
   Star,
   Github,
   ExternalLink,
+  Clapperboard,
 } from "lucide-react";
 
 const HomePage = () => {
@@ -85,10 +84,10 @@ const HomePage = () => {
   ];
 
   const stats = [
-    { label: "Video Tools", value: "25+", icon: Video },
-    { label: "AI Models", value: "1", icon: Brain },
-    { label: "Supported Formats", value: "5", icon: Code },
-    { label: "Processing Speed", value: "Real-time", icon: Timer },
+    { label: "Video Tools", value: "24+", icon: Video },
+    { label: "AI Powered", value: "Smart", icon: Brain },
+    { label: "Formats Supported", value: "5+", icon: Film },
+    { label: "Processing Speed", value: "Lightning", icon: Zap },
   ];
 
   return (
