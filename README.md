@@ -89,6 +89,34 @@ python app/main.py
 
 The API will be available at `http://localhost:8000`
 
+### Frontend Setup
+
+If you're setting up the frontend separately:
+
+```bash
+cd frontend  # Navigate to frontend directory
+npm install  # Install frontend dependencies
+```
+
+Create a frontend `.env` file:
+
+```env
+# API Configuration
+REACT_APP_API_URL=http://localhost:8000
+REACT_APP_API_VERSION=v1
+
+# Optional
+REACT_APP_DEBUG=false
+```
+
+Start the frontend development server:
+
+```bash
+npm start
+```
+
+The frontend will be available at `http://localhost:3000`
+
 ## 📖 API Usage
 
 ### 1. Upload Video
