@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useJob } from "../context/JobContext";
 import { apiService } from "../services/api";
+import toast from "react-hot-toast";
 
 const VideoUpload = () => {
   const { uploadVideo, loading, supportedFormats, currentJob } = useJob();
@@ -257,9 +258,9 @@ const VideoUpload = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="btn-primary px-6 py-3 mx-auto block"
+              className="btn-primary px-6 py-3 mx-auto block flex flex-col items-center space-y-1"
             >
-              <Upload className="w-4 h-4 mr-2" />
+              <Upload className="w-4 h-4" />
               Browse Files
             </motion.button>
           )}
