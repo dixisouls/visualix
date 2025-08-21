@@ -29,14 +29,6 @@ class Settings(BaseSettings):
     temp_dir: Path = Field(default=Path("temp"), env="TEMP_DIR")
     max_file_size: int = Field(default=100 * 1024 * 1024, env="MAX_FILE_SIZE")  # 100MB
     allowed_video_formats: list = ["mp4", "avi", "mov", "wmv", "flv", "webm"]
-       
-    # Processing settings
-    max_concurrent_jobs: int = Field(default=5, env="MAX_CONCURRENT_JOBS")
-    job_timeout: int = Field(default=3600, env="JOB_TIMEOUT")  # 1 hour
-    
-    # LangGraph settings
-    langgraph_max_iterations: int = Field(default=50, env="LANGGRAPH_MAX_ITERATIONS")
-    langgraph_timeout: int = Field(default=300, env="LANGGRAPH_TIMEOUT")  # 5 minutes
     
     # Security settings
     cors_origins: list = ["http://localhost:3000", "http://127.0.0.1:3000"]

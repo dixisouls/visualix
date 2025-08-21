@@ -23,19 +23,8 @@ class GeminiAPIError(VisualixBaseException):
     """Exception raised for Google Gemini API errors."""
     pass
 
-
-class LangGraphWorkflowError(VisualixBaseException):
-    """Exception raised for LangGraph workflow errors."""
-    pass
-
-
 class FileValidationError(VisualixBaseException):
     """Exception raised for file validation errors."""
-    pass
-
-
-class JobError(VisualixBaseException):
-    """Exception raised for job processing errors."""
     pass
 
 

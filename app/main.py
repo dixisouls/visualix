@@ -31,10 +31,6 @@ async def lifespan(app: FastAPI):
     settings.output_dir.mkdir(exist_ok=True)  
     settings.temp_dir.mkdir(exist_ok=True)
     
-    # Initialize services (Redis, database, etc.)
-    # TODO: Add Redis connection initialization
-    # TODO: Add database initialization if needed
-    
     # Start the hourly cleanup service
     try:
         from app.services.cleanup_scheduler import start_cleanup_service
