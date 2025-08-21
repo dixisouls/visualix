@@ -385,3 +385,223 @@ class PerspectiveTool(BaseVideoTool):
     
     async def execute(self, video_path: str, **kwargs) -> ToolResult:
         return await self._execute_frame_by_frame(video_path, **kwargs)
+
+
+class StabilizationTool(BaseVideoTool):
+    """Video stabilization tool for reducing camera shake."""
+    
+    @property
+    def name(self) -> str:
+        return "apply_stabilization"
+    
+    @property
+    def description(self) -> str:
+        return "Remove camera shake and smooth out handheld footage for professional results."
+    
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return {
+            "video_path": {"type": "string", "description": "Path to input video file"},
+            "smoothing": {
+                "type": "number",
+                "description": "Smoothing factor (0.1 to 1.0, higher = more stable but may crop more)",
+                "minimum": 0.1,
+                "maximum": 1.0,
+                "default": 0.7
+            },
+            "max_corners": {
+                "type": "integer",
+                "description": "Maximum number of feature points to track (100 to 1000)",
+                "minimum": 100,
+                "maximum": 1000,
+                "default": 200
+            },
+            "crop_border": {
+                "type": "number",
+                "description": "Border crop percentage to hide stabilization artifacts (0.05 to 0.2)",
+                "minimum": 0.05,
+                "maximum": 0.2,
+                "default": 0.1
+            }
+        }
+    
+    async def execute(self, video_path: str, **kwargs) -> ToolResult:
+        """Custom execution for stabilization as it requires frame-to-frame analysis."""
+        import time
+        start_time = time.time()
+        
+        try:
+            # Validate input
+            self._validate_video_path(video_path)
+            
+            # Generate output path
+            output_path = self._get_output_path(video_path)
+            
+            # Get parameters
+            smoothing = kwargs.get('smoothing', 0.7)
+            max_corners = int(kwargs.get('max_corners', 200))
+            crop_border = kwargs.get('crop_border', 0.1)
+            
+            # Read video
+            cap, properties = self._read_video(video_path)
+            
+            # Calculate crop dimensions
+            width, height = properties['width'], properties['height']
+            crop_w = int(width * (1 - 2 * crop_border))
+            crop_h = int(height * (1 - 2 * crop_border))
+            crop_x = int((width - crop_w) / 2)
+            crop_y = int((height - crop_h) / 2)
+            
+            # Create video writer
+            writer = self._write_video(output_path, properties['fps'], crop_w, crop_h)
+            
+            # Initialize tracking
+            prev_gray = None
+            prev_pts = None
+            transforms = []
+            
+            # Parameters for goodFeaturesToTrack
+            feature_params = dict(
+                maxCorners=max_corners,
+                qualityLevel=0.3,
+                minDistance=7,
+                blockSize=7
+            )
+            
+            # Parameters for Lucas-Kanade optical flow
+            lk_params = dict(
+                winSize=(15, 15),
+                maxLevel=2,
+                criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03)
+            )
+            
+            frame_count = 0
+            frames = []
+            
+            # First pass: collect all frames and calculate transforms
+            self.logger.info("First pass: analyzing motion...")
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                
+                frames.append(frame.copy())
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                
+                if prev_gray is not None:
+                    # Track feature points
+                    if prev_pts is not None and len(prev_pts) > 0:
+                        curr_pts, status, error = cv2.calcOpticalFlowPyrLK(
+                            prev_gray, gray, prev_pts, None, **lk_params
+                        )
+                        
+                        # Filter good points
+                        good_prev = prev_pts[status == 1]
+                        good_curr = curr_pts[status == 1]
+                        
+                        if len(good_prev) >= 10:
+                            # Estimate affine transform
+                            transform = cv2.estimateAffinePartial2D(good_prev, good_curr)[0]
+                            if transform is not None:
+                                # Extract translation and rotation
+                                dx = transform[0, 2]
+                                dy = transform[1, 2]
+                                da = np.arctan2(transform[1, 0], transform[0, 0])
+                            else:
+                                dx = dy = da = 0
+                        else:
+                            dx = dy = da = 0
+                    else:
+                        dx = dy = da = 0
+                    
+                    transforms.append([dx, dy, da])
+                
+                # Detect new features
+                prev_pts = cv2.goodFeaturesToTrack(gray, mask=None, **feature_params)
+                prev_gray = gray.copy()
+                
+                frame_count += 1
+                if frame_count % 30 == 0:
+                    progress = (frame_count / len(frames)) * 50  # First pass is 50%
+                    self.logger.info(f"Motion analysis progress: {progress:.1f}%")
+            
+            cap.release()
+            
+            if not transforms:
+                raise OpenCVToolError("No motion detected for stabilization")
+            
+            # Calculate smooth trajectory
+            self.logger.info("Calculating smooth trajectory...")
+            transforms = np.array(transforms)
+            
+            # Cumulative trajectory
+            trajectory = np.cumsum(transforms, axis=0)
+            
+            # Smooth trajectory using moving average
+            smoothed_trajectory = np.zeros_like(trajectory)
+            window = int(smoothing * len(trajectory) * 0.1)  # Adaptive window size
+            window = max(5, min(window, len(trajectory) // 4))
+            
+            for i in range(len(trajectory)):
+                start = max(0, i - window)
+                end = min(len(trajectory), i + window + 1)
+                smoothed_trajectory[i] = np.mean(trajectory[start:end], axis=0)
+            
+            # Calculate corrective transforms
+            corrective_transforms = smoothed_trajectory - trajectory
+            
+            # Second pass: apply stabilization
+            self.logger.info("Second pass: applying stabilization...")
+            for i, frame in enumerate(frames):
+                if i < len(corrective_transforms):
+                    dx, dy, da = corrective_transforms[i]
+                    
+                    # Create transformation matrix
+                    transform_matrix = np.array([
+                        [np.cos(da), -np.sin(da), dx],
+                        [np.sin(da), np.cos(da), dy]
+                    ], dtype=np.float32)
+                    
+                    # Apply transformation
+                    stabilized = cv2.warpAffine(frame, transform_matrix, (width, height))
+                    
+                    # Crop to remove borders
+                    cropped = stabilized[crop_y:crop_y+crop_h, crop_x:crop_x+crop_w]
+                else:
+                    # For frames without transforms, just crop
+                    cropped = frame[crop_y:crop_y+crop_h, crop_x:crop_x+crop_w]
+                
+                writer.write(cropped)
+                
+                if (i + 1) % 30 == 0:
+                    progress = 50 + ((i + 1) / len(frames)) * 50  # Second pass is 50%
+                    self.logger.info(f"Stabilization progress: {progress:.1f}%")
+            
+            writer.release()
+            
+            execution_time = time.time() - start_time
+            
+            self.logger.info(f"Stabilization completed successfully in {execution_time:.2f}s")
+            
+            return ToolResult(
+                success=True,
+                output_path=output_path,
+                execution_time=execution_time,
+                metadata={
+                    'frames_processed': len(frames),
+                    'transforms_applied': len(corrective_transforms),
+                    'crop_percentage': crop_border * 100,
+                    'smoothing_factor': smoothing
+                }
+            )
+            
+        except Exception as e:
+            execution_time = time.time() - start_time
+            error_msg = f"Stabilization tool failed: {str(e)}"
+            self.logger.error(error_msg)
+            
+            return ToolResult(
+                success=False,
+                execution_time=execution_time,
+                error_message=error_msg
+            )
