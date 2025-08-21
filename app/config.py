@@ -4,7 +4,7 @@ Configuration settings for Visualix application.
 
 from pydantic_settings import BaseSettings
 from pydantic import Field
-from typing import Optional
+from typing import Optional, List
 import os
 from pathlib import Path
 
@@ -31,9 +31,8 @@ class Settings(BaseSettings):
     allowed_video_formats: list = ["mp4", "avi", "mov", "wmv", "flv", "webm"]
     
     # Security settings 
-    cors_origins: list = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"],
-        env="CORS_ORIGINS"
+    cors_origins: List[str] = Field(
+        default=["http://localhost:3000", "http://127.0.0.1:3000"]
     )
     
     # Production settings
@@ -44,10 +43,19 @@ class Settings(BaseSettings):
         case_sensitive = False
 
     def __post_init__(self):
-        """Create necessary directories on initialization."""
+        """Create necessary directories and handle environment variable parsing."""
         self.upload_dir.mkdir(exist_ok=True)
         self.output_dir.mkdir(exist_ok=True)
         self.temp_dir.mkdir(exist_ok=True)
+        
+        # Parse CORS_ORIGINS environment variable
+        cors_env = os.getenv("CORS_ORIGINS")
+        if cors_env:
+            # Handle both single URLs and comma-separated lists
+            if "," in cors_env:
+                self.cors_origins = [origin.strip() for origin in cors_env.split(",")]
+            else:
+                self.cors_origins = [cors_env.strip()]
 
     @property
     def is_production(self) -> bool:
