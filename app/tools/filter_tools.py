@@ -239,3 +239,125 @@ class NoiseReductionTool(BaseVideoTool):
     
     async def execute(self, video_path: str, **kwargs) -> ToolResult:
         return await self._execute_frame_by_frame(video_path, **kwargs)
+
+
+class UnsharpMaskTool(BaseVideoTool):
+    """Unsharp mask sharpening filter tool."""
+    
+    @property
+    def name(self) -> str:
+        return "apply_unsharp_mask"
+    
+    @property
+    def description(self) -> str:
+        return "Professional sharpening technique that enhances perceived sharpness without artifacts."
+    
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return {
+            "video_path": {"type": "string", "description": "Path to input video file"},
+            "amount": {
+                "type": "number",
+                "description": "Sharpening amount (0.0 to 2.0, 1.0 = normal)",
+                "minimum": 0.0,
+                "maximum": 2.0,
+                "default": 1.0
+            },
+            "radius": {
+                "type": "number",
+                "description": "Sharpening radius (0.5 to 5.0, controls detail size)",
+                "minimum": 0.5,
+                "maximum": 5.0,
+                "default": 1.0
+            },
+            "threshold": {
+                "type": "integer",
+                "description": "Threshold to avoid sharpening noise (0 to 50)",
+                "minimum": 0,
+                "maximum": 50,
+                "default": 3
+            }
+        }
+    
+    def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
+        amount = kwargs.get('amount', 1.0)
+        radius = kwargs.get('radius', 1.0)
+        threshold = kwargs.get('threshold', 3)
+        
+        # Convert to float for processing
+        frame_float = frame.astype(np.float32)
+        
+        # Create Gaussian blur
+        sigma = radius
+        kernel_size = int(2 * radius * 2 + 1)
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        
+        blurred = cv2.GaussianBlur(frame_float, (kernel_size, kernel_size), sigma)
+        
+        # Create unsharp mask
+        mask = frame_float - blurred
+        
+        # Apply threshold
+        if threshold > 0:
+            # Only apply sharpening where difference is above threshold
+            threshold_mask = np.abs(mask) >= threshold
+            mask = mask * threshold_mask
+        
+        # Apply sharpening
+        sharpened = frame_float + amount * mask
+        
+        # Clamp and convert back
+        return np.clip(sharpened, 0, 255).astype(np.uint8)
+    
+    async def execute(self, video_path: str, **kwargs) -> ToolResult:
+        return await self._execute_frame_by_frame(video_path, **kwargs)
+
+
+class BilateralFilterTool(BaseVideoTool):
+    """Bilateral filter tool for edge-preserving smoothing."""
+    
+    @property
+    def name(self) -> str:
+        return "apply_bilateral_filter"
+    
+    @property
+    def description(self) -> str:
+        return "Edge-preserving smoothing filter ideal for skin smoothing and noise reduction."
+    
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return {
+            "video_path": {"type": "string", "description": "Path to input video file"},
+            "d": {
+                "type": "integer",
+                "description": "Diameter of each pixel neighborhood (5 to 25, higher = slower but smoother)",
+                "minimum": 5,
+                "maximum": 25,
+                "default": 9
+            },
+            "sigma_color": {
+                "type": "number",
+                "description": "Color similarity threshold (10 to 200, higher = more colors averaged)",
+                "minimum": 10,
+                "maximum": 200,
+                "default": 80
+            },
+            "sigma_space": {
+                "type": "number",
+                "description": "Spatial distance threshold (10 to 200, higher = farther pixels influence)",
+                "minimum": 10,
+                "maximum": 200,
+                "default": 80
+            }
+        }
+    
+    def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
+        d = int(kwargs.get('d', 9))
+        sigma_color = float(kwargs.get('sigma_color', 80))
+        sigma_space = float(kwargs.get('sigma_space', 80))
+        
+        return cv2.bilateralFilter(frame, d, sigma_color, sigma_space)
+    
+    async def execute(self, video_path: str, **kwargs) -> ToolResult:
+        return await self._execute_frame_by_frame(video_path, **kwargs)
