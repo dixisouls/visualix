@@ -386,3 +386,205 @@ class RetroEffectTool(BaseVideoTool):
     
     async def execute(self, video_path: str, **kwargs) -> ToolResult:
         return await self._execute_frame_by_frame(video_path, **kwargs)
+
+
+class BlackWhiteTool(BaseVideoTool):
+    """Black and white conversion tool."""
+    
+    @property
+    def name(self) -> str:
+        return "apply_black_white"
+    
+    @property
+    def description(self) -> str:
+        return "Convert to monochrome with professional contrast control for striking artistic results."
+    
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return {
+            "video_path": {"type": "string", "description": "Path to input video file"},
+            "method": {
+                "type": "string",
+                "description": "Conversion method: 'luminance', 'average', 'red', 'green', 'blue'",
+                "enum": ["luminance", "average", "red", "green", "blue"],
+                "default": "luminance"
+            },
+            "contrast": {
+                "type": "number",
+                "description": "Contrast adjustment (0.0 to 2.0, 1.0 = no change)",
+                "minimum": 0.0,
+                "maximum": 2.0,
+                "default": 1.0
+            },
+            "brightness": {
+                "type": "number",
+                "description": "Brightness adjustment (-100 to 100, 0 = no change)",
+                "minimum": -100,
+                "maximum": 100,
+                "default": 0
+            }
+        }
+    
+    def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
+        method = kwargs.get('method', 'luminance')
+        contrast = kwargs.get('contrast', 1.0)
+        brightness = kwargs.get('brightness', 0)
+        
+        # Convert to grayscale based on method
+        if method == 'luminance':
+            # Use OpenCV's standard luminance conversion
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        elif method == 'average':
+            # Simple average of RGB channels
+            gray = np.mean(frame, axis=2).astype(np.uint8)
+        elif method == 'red':
+            gray = frame[:, :, 2]  # Red channel (BGR format)
+        elif method == 'green':
+            gray = frame[:, :, 1]  # Green channel
+        elif method == 'blue':
+            gray = frame[:, :, 0]  # Blue channel
+        else:
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        
+        # Apply contrast and brightness adjustments
+        if contrast != 1.0 or brightness != 0:
+            gray = gray.astype(np.float32)
+            
+            # Apply contrast
+            gray = gray * contrast
+            
+            # Apply brightness
+            brightness_offset = (brightness / 100.0) * 127
+            gray = gray + brightness_offset
+            
+            # Clamp values
+            gray = np.clip(gray, 0, 255).astype(np.uint8)
+        
+        # Convert back to 3-channel image
+        return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+    
+    async def execute(self, video_path: str, **kwargs) -> ToolResult:
+        return await self._execute_frame_by_frame(video_path, **kwargs)
+
+
+class ColorPopTool(BaseVideoTool):
+    """Color pop effect tool for selective color enhancement."""
+    
+    @property
+    def name(self) -> str:
+        return "apply_color_pop"
+    
+    @property
+    def description(self) -> str:
+        return "Selective color enhancement that makes specific colors stand out dramatically."
+    
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return {
+            "video_path": {"type": "string", "description": "Path to input video file"},
+            "target_color": {
+                "type": "string",
+                "description": "Color to enhance: 'red', 'green', 'blue', 'yellow', 'cyan', 'magenta'",
+                "enum": ["red", "green", "blue", "yellow", "cyan", "magenta"],
+                "default": "red"
+            },
+            "intensity": {
+                "type": "number",
+                "description": "Color pop intensity (0.0 to 1.0, higher = more dramatic)",
+                "minimum": 0.0,
+                "maximum": 1.0,
+                "default": 0.8
+            },
+            "tolerance": {
+                "type": "number",
+                "description": "Color selection tolerance (0.1 to 1.0, higher = more colors included)",
+                "minimum": 0.1,
+                "maximum": 1.0,
+                "default": 0.3
+            },
+            "desaturate_others": {
+                "type": "boolean",
+                "description": "Whether to desaturate non-target colors",
+                "default": True
+            }
+        }
+    
+    def _get_color_range(self, color_name: str, tolerance: float) -> tuple:
+        """Get HSV color range for the specified color."""
+        # Base HSV ranges for different colors
+        color_ranges = {
+            'red': (0, 10),      # Red spans around 0/180
+            'yellow': (20, 30),
+            'green': (50, 70),
+            'cyan': (80, 100),
+            'blue': (100, 120),
+            'magenta': (140, 160)
+        }
+        
+        if color_name not in color_ranges:
+            color_name = 'red'
+        
+        base_range = color_ranges[color_name]
+        tolerance_range = tolerance * 30  # Scale tolerance
+        
+        lower_hue = max(0, base_range[0] - tolerance_range)
+        upper_hue = min(179, base_range[1] + tolerance_range)
+        
+        return (lower_hue, upper_hue)
+    
+    def _process_frame(self, frame: np.ndarray, **kwargs) -> np.ndarray:
+        target_color = kwargs.get('target_color', 'red')
+        intensity = kwargs.get('intensity', 0.8)
+        tolerance = kwargs.get('tolerance', 0.3)
+        desaturate_others = kwargs.get('desaturate_others', True)
+        
+        # Convert to HSV for color selection
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        
+        # Get color range
+        hue_min, hue_max = self._get_color_range(target_color, tolerance)
+        
+        # Create mask for target color
+        if target_color == 'red' and hue_min < 10:
+            # Handle red wraparound (red is at 0 and 180)
+            mask1 = cv2.inRange(hsv, (0, 50, 50), (10, 255, 255))
+            mask2 = cv2.inRange(hsv, (170, 50, 50), (179, 255, 255))
+            mask = cv2.bitwise_or(mask1, mask2)
+        else:
+            mask = cv2.inRange(hsv, (hue_min, 50, 50), (hue_max, 255, 255))
+        
+        # Smooth the mask
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        mask = cv2.GaussianBlur(mask, (5, 5), 0)
+        
+        # Normalize mask to 0-1 range
+        mask_norm = mask.astype(np.float32) / 255.0
+        mask_3ch = np.stack([mask_norm] * 3, axis=-1)
+        
+        result = frame.copy().astype(np.float32)
+        
+        if desaturate_others:
+            # Create desaturated version
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            desaturated = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR).astype(np.float32)
+            
+            # Blend original with desaturated based on mask
+            result = mask_3ch * result + (1 - mask_3ch) * desaturated
+        
+        # Enhance saturation of target color
+        if intensity > 0:
+            hsv_result = cv2.cvtColor(result.astype(np.uint8), cv2.COLOR_BGR2HSV).astype(np.float32)
+            
+            # Boost saturation where mask is active
+            saturation_boost = 1 + intensity * 0.5
+            hsv_result[:, :, 1] = hsv_result[:, :, 1] * (1 + mask_norm * saturation_boost)
+            hsv_result[:, :, 1] = np.clip(hsv_result[:, :, 1], 0, 255)
+            
+            result = cv2.cvtColor(hsv_result.astype(np.uint8), cv2.COLOR_HSV2BGR).astype(np.float32)
+        
+        return np.clip(result, 0, 255).astype(np.uint8)
+    
+    async def execute(self, video_path: str, **kwargs) -> ToolResult:
+        return await self._execute_frame_by_frame(video_path, **kwargs)
