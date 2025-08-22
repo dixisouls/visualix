@@ -21,7 +21,7 @@ class OriginValidationMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, allowed_origins: List[str], allowed_paths: List[str] = None):
         super().__init__(app)
         self.allowed_origins = allowed_origins if isinstance(allowed_origins, list) else [allowed_origins]
-        self.allowed_paths = allowed_paths or ["/health", "/", "/docs", "/openapi.json", "/api/v1/cleanup/manual"]
+        self.allowed_paths = allowed_paths or ["/health", "/", "/docs", "/openapi.json"]
         self.logger = logging.getLogger(__name__)
         
         self.logger.info(f"OriginValidationMiddleware initialized with origins: {self.allowed_origins}")
