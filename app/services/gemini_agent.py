@@ -46,7 +46,6 @@ class GeminiAgent:
         self.logger = logging.getLogger(__name__)
         self.model = None
         self._initialize_gemini()
-        print("Gemini agent initialized")
         self.tool_descriptions = self._get_serializable_tool_descriptions()
         
     def _initialize_gemini(self):
@@ -83,7 +82,7 @@ class GeminiAgent:
                 generation_config=generation_config,
                 safety_settings=safety_settings
             )
-            
+            print("Gemini agent initialized")
             self.logger.info(f"Gemini agent initialized with model: {settings.gemini_model}")
             
         except Exception as e:
