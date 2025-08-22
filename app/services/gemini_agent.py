@@ -83,7 +83,7 @@ class GeminiAgent:
                 safety_settings=safety_settings
             )
             
-            self.logger.info(f"Modern Gemini agent initialized with model: {settings.gemini_model}")
+            self.logger.info(f"Gemini agent initialized with model: {settings.gemini_model}")
             
         except Exception as e:
             self.logger.error(f"Failed to initialize Gemini: {str(e)}")
