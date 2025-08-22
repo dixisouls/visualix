@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.config import settings
 from app.api import router as api_router
 from app.core.logging_config import setup_logging
+from app.middleware import OriginValidationMiddleware
 
 
 @asynccontextmanager
@@ -74,6 +75,13 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE"],  # More restrictive
         allow_headers=["*"],
+    )
+    
+    # Add origin validation middleware (must be after CORS)
+    app.add_middleware(
+        OriginValidationMiddleware,
+        allowed_origins=settings.cors_origins,
+        allowed_paths=["/health", "/", "/docs", "/openapi.json", "/redoc"]
     )
     
     # Add trusted host middleware
