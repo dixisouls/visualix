@@ -4,9 +4,9 @@ Custom middleware to validate request origins and block direct API access.
 
 import logging
 from typing import List
-from fastapi import Request, HTTPException
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
+from starlette.responses import Response, JSONResponse
 
 
 class OriginValidationMiddleware(BaseHTTPMiddleware):
@@ -45,27 +45,27 @@ class OriginValidationMiddleware(BaseHTTPMiddleware):
         # Block requests with no origin or referer (typical of direct API calls)
         if not origin and not referer:
             self.logger.warning(f"Blocked request to {request.url.path} - No origin or referer header")
-            raise HTTPException(
-                status_code=403, 
-                detail="Access forbidden: Requests must originate from authorized frontend applications"
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "Access forbidden: Requests must originate from authorized frontend applications"}
             )
         
         # Validate origin if present
         if origin:
             if not self._is_origin_allowed(origin):
                 self.logger.warning(f"Blocked request from unauthorized origin: {origin}")
-                raise HTTPException(
-                    status_code=403, 
-                    detail=f"Access forbidden: Origin '{origin}' is not authorized"
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": f"Access forbidden: Origin '{origin}' is not authorized"}
                 )
         
         # Validate referer if present (and no origin)
         elif referer:
             if not self._is_referer_allowed(referer):
                 self.logger.warning(f"Blocked request with unauthorized referer: {referer}")
-                raise HTTPException(
-                    status_code=403, 
-                    detail="Access forbidden: Referer not authorized"
+                return JSONResponse(
+                    status_code=403,
+                    content={"detail": "Access forbidden: Referer not authorized"}
                 )
         
         # Request is valid, proceed
