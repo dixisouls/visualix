@@ -4,6 +4,13 @@ A sophisticated video processing application that uses Google Gemini AI to
 analyze natural language prompts and orchestrate OpenCV operations through
 custom agentic workflows.
 
+## 🌟 Live Demo
+
+**[Try VisualiX Live](https://visualix-six.vercel.app/)**
+
+Experience the power of AI-driven video processing directly!
+Upload a video and describe your desired edits in natural language.
+
 ## 🚀 Features
 
 - **Natural Language Processing**: Describe video edits in plain English
