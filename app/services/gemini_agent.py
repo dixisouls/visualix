@@ -82,7 +82,6 @@ class GeminiAgent:
                 generation_config=generation_config,
                 safety_settings=safety_settings
             )
-            print("Gemini agent initialized")
             self.logger.info(f"Gemini agent initialized with model: {settings.gemini_model}")
             
         except Exception as e:
