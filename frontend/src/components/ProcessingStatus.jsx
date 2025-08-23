@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Loader,
   CheckCircle,
@@ -9,24 +9,43 @@ import {
   RefreshCw,
   Trash2,
   AlertTriangle,
-  Brain,
   Settings,
-  Zap,
   Sparkles,
-  Play,
-  Pause,
   BarChart3,
-  Timer,
-  Cpu,
   ArrowRight,
-  Activity,
 } from "lucide-react";
 import { apiService } from "../services/api";
 
 const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
+  const [progressBar, setProgressBar] = useState(0);
+
   // Debug logging
   console.log("🎬 ProcessingStatus received job:", job);
   console.log("🔍 Job status:", job?.status, "| Has prompt:", !!job?.prompt);
+
+  // Handle progress bar animation
+  useEffect(() => {
+    if (job?.status === "processing") {
+      // Start slow progress animation
+      const interval = setInterval(() => {
+        setProgressBar(prev => {
+          // Slow progress that approaches but never reaches 100%
+          if (prev < 90) {
+            return prev + 0.3; // Very slow increment
+          }
+          return prev;
+        });
+      }, 200); // Update every 200ms
+
+      return () => clearInterval(interval);
+    } else if (job?.status === "completed") {
+      // Instantly complete the progress bar
+      setProgressBar(100);
+    } else {
+      // Reset progress bar for other states
+      setProgressBar(0);
+    }
+  }, [job?.status]);
 
   if (!job) {
     return (
@@ -142,63 +161,37 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         </h3>
         <p className="text-gray-600 mb-4">{statusInfo.description}</p>
 
-        {/* Beautiful Spinner for Processing */}
-        {(() => {
-          console.log(
-            "🎪 Checking spinner condition - job.status:",
-            job.status,
-            "=== 'processing':",
-            job.status === "processing"
-          );
-          return job.status === "processing";
-        })() && (
+        {/* Progress Bar for Processing */}
+        {job.status === "processing" && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center space-y-4 my-8"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="my-8"
           >
-            {/* Main Spinner */}
-            <div className="relative">
-              {/* Outer ring */}
-              <motion.div
-                className="w-16 h-16 border-4 border-primary-200 rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-              {/* Inner spinning ring */}
-              <motion.div
-                className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-t-primary-600 rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-              {/* Center dot */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary-600 rounded-full animate-pulse" />
+            <div className="text-center mb-4">
+              <p className="text-lg font-semibold text-gray-900 mb-2">
+                Processing your video...
+              </p>
+              <p className="text-sm text-gray-600">
+                Our AI is working its magic ✨
+              </p>
             </div>
-
-            {/* Processing Text */}
-            <div className="text-center">
-              <motion.div
-                className="text-lg font-semibold text-gray-900 mb-2"
-                animate={{ opacity: [0.5, 1, 0.5] }}
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+              <motion.div 
+                className="bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${progressBar}%` }}
+                animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{
                   duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
-              >
-                Processing your video...
-              </motion.div>
-              <p className="text-sm text-gray-600">
-                Our AI is working its magic ✨
-              </p>
+              />
+            </div>
+            <div className="text-center">
+              <span className="text-sm text-gray-600">{Math.round(progressBar)}% complete</span>
             </div>
           </motion.div>
         )}
@@ -288,109 +281,6 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         </div>
       </div>
 
-      {/* Enhanced Processing Animation */}
-      {job.status === "processing" && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-primary-50 via-purple-50 to-blue-50 rounded-xl p-8 border border-primary-100"
-        >
-          <div className="flex flex-col items-center text-center space-y-6">
-            {/* Large Animated Spinner */}
-            <div className="relative">
-              {/* Background Circle */}
-              <div className="w-24 h-24 border-8 border-gray-200 rounded-full"></div>
-
-              {/* Main Spinning Ring */}
-              <motion.div
-                className="absolute top-0 left-0 w-24 h-24 border-8 border-transparent border-t-primary-500 border-r-primary-500 rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-
-              {/* Secondary Ring */}
-              <motion.div
-                className="absolute top-2 left-2 w-20 h-20 border-4 border-transparent border-t-purple-400 rounded-full"
-                animate={{ rotate: -360 }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-              />
-
-              {/* Center Icon */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <motion.div
-                  animate={{ scale: [0.8, 1.1, 0.8] }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="w-8 h-8 bg-gradient-to-br from-primary-500 to-purple-600 rounded-full flex items-center justify-center"
-                >
-                  <Sparkles className="w-4 h-4 text-white" />
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Processing Messages */}
-            <div className="space-y-3">
-              <motion.h3
-                className="text-2xl font-bold text-gray-900"
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                AI Processing Your Video
-              </motion.h3>
-
-              <p className="text-gray-600 max-w-md">
-                Our advanced AI is analyzing your video and applying the
-                requested transformations. This may take a few moments...
-              </p>
-            </div>
-
-            {/* Tech Stack Indicators */}
-            <div className="flex items-center space-x-6 pt-4 border-t border-primary-100">
-              <motion.div
-                className="flex items-center space-x-2 text-sm text-gray-600"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 0 }}
-              >
-                <Brain className="w-5 h-5 text-primary-500" />
-                <span>Gemini AI</span>
-              </motion.div>
-
-              <motion.div
-                className="flex items-center space-x-2 text-sm text-gray-600"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-              >
-                <Cpu className="w-5 h-5 text-purple-500" />
-                <span>OpenCV</span>
-              </motion.div>
-
-              <motion.div
-                className="flex items-center space-x-2 text-sm text-gray-600"
-                animate={{ opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 2 }}
-              >
-                <Zap className="w-5 h-5 text-blue-500" />
-                <span>Processing</span>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
-      )}
 
       {/* Error Message */}
       {job.status === "failed" && job.error && (
