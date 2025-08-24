@@ -173,7 +173,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
                 Processing your video...
               </p>
               <p className="text-sm text-gray-600">
-                Our AI is working its magic ✨
+                Higher resolution videos take longer to process ✨
               </p>
             </div>
             
