@@ -190,9 +190,7 @@ const ProcessPage = () => {
     if (!currentJob || currentJob.status !== "completed") return;
 
     try {
-      const filename = `${
-        currentJob.video_metadata.filename.split(".")[0]
-      }_processed.mp4`;
+      const filename = "processed_result.mp4";
       await downloadVideo(currentJob.job_id, filename);
     } catch (error) {
       console.error("Download error:", error);

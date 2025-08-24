@@ -62,6 +62,10 @@ function jobReducer(state, action) {
         currentJob: {
           ...state.currentJob,
           ...action.payload,
+          // Ensure critical fields are preserved if missing from payload
+          video_metadata: action.payload.video_metadata || state.currentJob.video_metadata,
+          created_at: action.payload.created_at || state.currentJob.created_at,
+          prompt: action.payload.prompt !== undefined ? action.payload.prompt : state.currentJob.prompt,
         },
       };
       console.log(
@@ -96,7 +100,16 @@ function jobReducer(state, action) {
 
       if (existingIndex >= 0) {
         const updatedHistory = [...state.jobHistory];
-        updatedHistory[existingIndex] = action.payload;
+        const existingJob = updatedHistory[existingIndex];
+        // Merge with existing job data to preserve video_metadata and other fields
+        updatedHistory[existingIndex] = {
+          ...existingJob,
+          ...action.payload,
+          // Preserve critical fields if missing from payload
+          video_metadata: action.payload.video_metadata || existingJob.video_metadata,
+          created_at: action.payload.created_at || existingJob.created_at,
+          prompt: action.payload.prompt !== undefined ? action.payload.prompt : existingJob.prompt,
+        };
         return {
           ...state,
           jobHistory: updatedHistory,
@@ -278,18 +291,32 @@ export function JobProvider({ children }) {
       try {
         const status = await apiService.getJobStatus(jobId);
 
+        // Preserve existing job data when updating status
+        const existingJob = state.currentJob?.job_id === jobId ? state.currentJob : 
+                           state.jobHistory.find(job => job.job_id === jobId);
+
+        const mergedStatus = existingJob ? {
+          ...existingJob,
+          ...status,
+          // Ensure video_metadata is preserved if not included in status response
+          video_metadata: status.video_metadata || existingJob.video_metadata,
+          // Preserve other important fields that might be missing from status
+          created_at: status.created_at || existingJob.created_at,
+          prompt: status.prompt || existingJob.prompt,
+        } : status;
+
         if (state.currentJob && state.currentJob.job_id === jobId) {
-          dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: status });
+          dispatch({ type: JobActions.UPDATE_JOB_STATUS, payload: mergedStatus });
         }
 
-        dispatch({ type: JobActions.ADD_TO_HISTORY, payload: status });
-        return status;
+        dispatch({ type: JobActions.ADD_TO_HISTORY, payload: mergedStatus });
+        return mergedStatus;
       } catch (error) {
         console.error("Failed to check job status:", error);
         throw error;
       }
     },
-    [state.currentJob]
+    [state.currentJob, state.jobHistory]
   );
 
   // Delete job

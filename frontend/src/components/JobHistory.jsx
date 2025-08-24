@@ -123,9 +123,7 @@ const JobHistory = ({ onClose }) => {
       switch (action) {
         case "download":
           if (job.status === "completed") {
-            const filename = `${
-              job.video_metadata?.filename?.split(".")[0] || "processed"
-            }_result.mp4`;
+            const filename = "processed_result.mp4";
             await downloadVideo(job.job_id, filename);
           }
           break;
@@ -267,7 +265,8 @@ const JobHistory = ({ onClose }) => {
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-gray-900 truncate">
-                            {job.video_metadata?.filename || "Unknown Video"}
+                            {job.video_metadata?.filename || 
+                             (job.job_id ? `Video-${job.job_id.slice(0, 8)}` : "Unknown Video")}
                           </h4>
                           <div className="flex items-center space-x-3 text-sm text-gray-600 mt-1">
                             <span className="flex items-center">
