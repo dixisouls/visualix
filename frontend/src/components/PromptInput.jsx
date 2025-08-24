@@ -169,10 +169,10 @@ const PromptInput = ({
         <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Wand2 className="w-8 h-8 text-white" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           Describe Your Vision
         </h3>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Tell our AI what you want to achieve with your video. Use natural
           language – no technical knowledge required!
         </p>
@@ -184,7 +184,7 @@ const PromptInput = ({
           <textarea
             value={prompt}
             onChange={(e) => onPromptChange(e.target.value)}
-            placeholder="Describe what you want to do with your video... For example: 'make this look vintage with sepia tones and film grain' or 'brighten the video and add a soft blur effect'"
+            placeholder="Describe what you want to do with your video... For example: 'make this look vintage' or 'brighten the video'"
             rows={4}
             disabled={disabled || loading}
             className={`w-full px-4 py-4 border rounded-xl resize-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
@@ -239,7 +239,7 @@ const PromptInput = ({
           disabled={!isValidPrompt || loading || disabled}
           whileHover={!disabled && isValidPrompt ? { scale: 1.02 } : {}}
           whileTap={!disabled && isValidPrompt ? { scale: 0.98 } : {}}
-          className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 flex items-center justify-center space-x-3 ${
+          className={`w-full py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold text-base sm:text-lg transition-all duration-200 flex items-center justify-center space-x-3 ${
             isValidPrompt && !disabled && !loading
               ? "bg-gradient-to-r from-primary-600 to-purple-600 text-white shadow-lg hover:shadow-xl"
               : "bg-gray-200 text-gray-500 cursor-not-allowed"
@@ -294,7 +294,7 @@ const PromptInput = ({
               className="mt-4 space-y-4"
             >
               {/* Category Tabs */}
-              <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
+              <div className="flex space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide">
                 {categories.map((category) => {
                   const Icon = category.icon;
                   const isActive = selectedCategory === category.id;
@@ -303,7 +303,7 @@ const PromptInput = ({
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 ${
+                      className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-sm sm:text-base ${
                         isActive
                           ? "bg-primary-600 text-white"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -317,7 +317,7 @@ const PromptInput = ({
               </div>
 
               {/* Examples Grid */}
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-3">
                 {promptExamples[selectedCategory]?.map((example, index) => {
                   const Icon = example.icon;
 
@@ -329,7 +329,7 @@ const PromptInput = ({
                       transition={{ delay: index * 0.1 }}
                       onClick={() => handleExampleClick(example.text)}
                       disabled={disabled || loading}
-                      className="text-left p-4 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-left p-3 sm:p-4 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <div className="flex items-start space-x-3">
                         <div

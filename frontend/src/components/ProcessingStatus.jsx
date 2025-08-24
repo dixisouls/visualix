@@ -53,7 +53,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
         <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Settings className="w-8 h-8 text-gray-400" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
           No Job Selected
         </h3>
         <p className="text-gray-600">
@@ -156,7 +156,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
           )}
         </motion.div>
 
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
           {statusInfo.title}
         </h3>
         <p className="text-gray-600 mb-4">{statusInfo.description}</p>
@@ -169,7 +169,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
             className="my-8"
           >
             <div className="text-center mb-4">
-              <p className="text-lg font-semibold text-gray-900 mb-2">
+              <p className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                 Processing your video...
               </p>
               <p className="text-sm text-gray-600">
@@ -198,7 +198,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
       </div>
 
       {/* Job Details */}
-      <div className="bg-gray-50 rounded-xl p-6">
+      <div className="bg-gray-50 rounded-xl p-4 sm:p-6">
         <h4 className="font-semibold text-gray-900 mb-4 flex items-center">
           <BarChart3 className="w-5 h-5 mr-2" />
           Job Details
@@ -309,7 +309,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onDownload}
-            className="w-full btn-success py-4 text-lg flex items-center justify-center space-x-3"
+            className="w-full btn-success py-3 sm:py-4 text-base sm:text-lg flex items-center justify-center space-x-3"
           >
             <Download className="w-5 h-5" />
             <span>Download Processed Video</span>
@@ -324,7 +324,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onRetry}
-            className="w-full btn-primary py-4 text-lg flex items-center justify-center space-x-3"
+            className="w-full btn-primary py-3 sm:py-4 text-base sm:text-lg flex items-center justify-center space-x-3"
           >
             <RefreshCw className="w-5 h-5" />
             <span>Try Again</span>
@@ -357,7 +357,7 @@ const ProcessingStatus = ({ job, onDownload, onDelete, onRetry }) => {
             <Sparkles className="w-5 h-5 mr-2" />
             While We Work Our Magic...
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-blue-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-blue-800">
             <div className="flex items-start space-x-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
               <span>AI analyzes your video frame by frame</span>

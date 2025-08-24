@@ -112,54 +112,54 @@ const VideoUpload = () => {
         </p>
 
         {/* Video Details */}
-        <div className="bg-gray-50 rounded-xl p-6 mb-6">
-          <div className="flex items-center justify-center space-x-3 mb-4">
+        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 mb-6">
+          <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-4 min-w-0">
             <FileVideo className="w-6 h-6 text-gray-600" />
-            <span className="font-medium text-gray-900 truncate max-w-xs">
+            <span className="font-medium text-gray-900 truncate text-sm sm:text-base max-w-[200px] sm:max-w-xs">
               {currentJob.video_metadata?.filename}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4 text-xs sm:text-sm">
+            <div className="text-center min-w-0">
               <Monitor className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 truncate">
                 {currentJob.video_metadata?.width}×
                 {currentJob.video_metadata?.height}
               </div>
-              <div className="text-gray-500">Resolution</div>
+              <div className="text-gray-500 truncate">Resolution</div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center min-w-0">
               <Clock className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 truncate">
                 {currentJob.video_metadata?.duration
                   ? apiService.formatDuration(
                       currentJob.video_metadata.duration
                     )
                   : "Unknown"}
               </div>
-              <div className="text-gray-500">Duration</div>
+              <div className="text-gray-500 truncate">Duration</div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center min-w-0">
               <HardDrive className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 truncate">
                 {currentJob.video_metadata?.size
                   ? apiService.formatFileSize(currentJob.video_metadata.size)
                   : "Unknown"}
               </div>
-              <div className="text-gray-500">File Size</div>
+              <div className="text-gray-500 truncate">File Size</div>
             </div>
 
-            <div className="text-center">
+            <div className="text-center min-w-0">
               <Film className="w-5 h-5 text-gray-400 mx-auto mb-1" />
-              <div className="font-medium text-gray-900">
+              <div className="font-medium text-gray-900 truncate">
                 {currentJob.video_metadata?.fps
                   ? `${Math.round(currentJob.video_metadata.fps)} fps`
                   : "Unknown"}
               </div>
-              <div className="text-gray-500">Frame Rate</div>
+              <div className="text-gray-500 truncate">Frame Rate</div>
             </div>
           </div>
         </div>
@@ -178,7 +178,7 @@ const VideoUpload = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-hidden">
       {/* Upload Zone */}
       <div
         {...getRootProps()}
@@ -195,23 +195,23 @@ const VideoUpload = () => {
         <div className="space-y-4">
           {/* Icon */}
           <div
-            className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-200 ${
               isDragActive ? "bg-primary-100 scale-110" : "bg-gray-100"
             }`}
           >
             {loading ? (
-              <Loader className="w-8 h-8 text-primary-600 animate-spin" />
+              <Loader className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600 animate-spin" />
             ) : isDragActive ? (
-              <Upload className="w-8 h-8 text-primary-600" />
+              <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
             ) : (
-              <FileVideo className="w-8 h-8 text-gray-600" />
+              <FileVideo className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600" />
             )}
           </div>
 
           {/* Text */}
           <div className="space-y-2">
             <h3
-              className={`text-xl font-semibold transition-colors ${
+              className={`text-lg sm:text-xl font-semibold transition-colors ${
                 isDragActive ? "text-primary-700" : "text-gray-900"
               }`}
             >
@@ -222,9 +222,9 @@ const VideoUpload = () => {
                 : "Upload your video"}
             </h3>
 
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600 px-2 sm:px-0">
               {loading
-                ? "Please wait while we process your file"
+                ? "Processing your file..."
                 : "Drag and drop your video file or click to browse"}
             </p>
           </div>
@@ -274,16 +274,16 @@ const VideoUpload = () => {
           File Requirements
         </h4>
 
-        <div className="grid md:grid-cols-2 gap-4 text-sm">
+        <div className="grid sm:grid-cols-2 gap-4 text-sm">
           <div>
             <div className="font-medium text-gray-700 mb-2">
               Supported Formats
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1 sm:gap-2">
               {supportedFormats.supported_formats.map((format) => (
                 <span
                   key={format}
-                  className="px-2 py-1 bg-white rounded-lg text-gray-600 uppercase font-mono text-xs"
+                  className="px-2 py-1 bg-white rounded-lg text-gray-600 uppercase font-mono text-xs flex-shrink-0"
                 >
                   {format}
                 </span>
@@ -302,15 +302,15 @@ const VideoUpload = () => {
         </div>
 
         {/* Tips */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-gray-200 hidden sm:block">
           <div className="font-medium text-gray-700 mb-2">
             💡 Tips for Best Results
           </div>
           <ul className="text-sm text-gray-600 space-y-1">
-            <li>• Higher resolution videos (1080p+) work best</li>
-            <li>• Ensure good lighting and contrast in your source video</li>
-            <li>• Shorter videos (under 2 minutes) process faster</li>
-            <li>• MP4 format is recommended for optimal compatibility</li>
+            <li>• Higher resolution (1080p+) works best</li>
+            <li>• Good lighting and contrast recommended</li>
+            <li>• Shorter videos process faster</li>
+            <li>• MP4 format is optimal</li>
           </ul>
         </div>
       </div>

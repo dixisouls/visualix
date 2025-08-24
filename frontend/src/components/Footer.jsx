@@ -69,7 +69,7 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="max-w-4xl mx-auto text-center">
           {/* Brand Section */}
           <div className="mb-8">
@@ -87,21 +87,21 @@ const Footer = () => {
                 </div>
               </motion.div>
               <div>
-                <h3 className="text-2xl font-bold text-white">VisualiX</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">VisualiX</h3>
                 <p className="text-sm text-gray-400">AI Video Editor</p>
               </div>
             </Link>
 
-            <p className="text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed text-lg">
+            <p className="text-gray-400 mb-6 lg:mb-8 max-w-2xl mx-auto leading-relaxed text-base sm:text-lg">
               Transform your videos with the power of AI. Professional video
               editing made simple through natural language processing and
               cutting-edge computer vision.
             </p>
 
             {/* Combined Tech Stack and Technology Links */}
-            <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:gap-8 max-w-2xl mx-auto">
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">Powered by</h4>
+                <h4 className="text-base sm:text-lg font-semibold text-white">Powered by</h4>
                 <div className="space-y-3">
                   {technologies.map((tech) => {
                     const Icon = tech.icon;
@@ -119,7 +119,7 @@ const Footer = () => {
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-lg font-semibold text-white">Technology</h4>
+                <h4 className="text-base sm:text-lg font-semibold text-white">Technology</h4>
                 <div className="space-y-3">
                   {navigation.technology.map((item) => (
                     <div key={item.name} className="flex justify-center">
@@ -143,8 +143,8 @@ const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col items-center justify-center space-y-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-6">
+          <div className="flex flex-col items-center justify-center space-y-3 lg:space-y-4">
             {/* Social Links */}
             <div className="flex items-center space-x-4">
               {socialLinks.map((social) => {
@@ -188,7 +188,7 @@ const Footer = () => {
           </div>
 
           {/* Additional Info */}
-          <div className="mt-6 pt-6 border-t border-gray-800">
+          <div className="mt-4 lg:mt-6 pt-4 lg:pt-6 border-t border-gray-800">
             <div className="text-center text-xs text-gray-500 space-y-1">
               <p>
                 VisualiX is an open-source AI video processing platform. Built

@@ -263,14 +263,14 @@ const ProcessPage = () => {
   };
 
   return (
-    <div className="min-h-screen pt-8 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-4 sm:pt-8 pb-8 sm:pb-16 px-2 sm:px-0">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8 w-full overflow-hidden">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-6 sm:mb-8 lg:mb-12 px-2">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6"
           >
             AI Video Processing
           </motion.h1>
@@ -278,7 +278,7 @@ const ProcessPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4"
           >
             Transform your videos with the power of AI. Upload, describe your
             vision, and let our intelligent system create magic.
@@ -313,25 +313,25 @@ const ProcessPage = () => {
           )}
         </AnimatePresence>
 
-        <div className="grid lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full">
           {/* Main Processing Panel */}
-          <div className="lg:col-span-8">
+          <div className="w-full lg:col-span-8 order-1 lg:order-none overflow-hidden">
             {/* Progress Tabs */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
+            <div className="mb-6 sm:mb-8">
+              <div className="flex items-center justify-between mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   Processing Steps
                 </h2>
                 <button
                   onClick={() => setShowHistory(!showHistory)}
-                  className="btn-ghost flex items-center space-x-2"
+                  className="btn-ghost flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base px-2 sm:px-3"
                 >
                   <History className="w-4 h-4" />
-                  <span>History</span>
+                  <span className="hidden sm:inline">History</span>
                 </button>
               </div>
 
-              <div className="flex items-center space-x-4 overflow-x-auto scrollbar-hide pb-4">
+              <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 overflow-x-auto scrollbar-hide pb-4">
                 {tabs.map((tab, index) => {
                   const Icon = tab.icon;
                   const status = getTabStatus(tab.id);
@@ -347,7 +347,7 @@ const ProcessPage = () => {
                           }
                         }}
                         disabled={status === "disabled"}
-                        className={`relative flex items-center space-x-3 px-6 py-4 rounded-xl font-medium transition-all duration-200 whitespace-nowrap ${
+                        className={`relative flex items-center space-x-1 sm:space-x-2 lg:space-x-3 px-2 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl font-medium transition-all duration-200 whitespace-nowrap text-xs sm:text-sm lg:text-base ${
                           isActive
                             ? "bg-primary-600 text-white shadow-lg"
                             : status === "completed"
@@ -360,7 +360,7 @@ const ProcessPage = () => {
                         }`}
                       >
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center ${
                             status === "completed"
                               ? "bg-success-600"
                               : status === "ready"
@@ -371,18 +371,18 @@ const ProcessPage = () => {
                           }`}
                         >
                           {status === "completed" ? (
-                            <CheckCircle className="w-5 h-5 text-white" />
+                            <CheckCircle className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
                           ) : (
                             <Icon
-                              className={`w-5 h-5 ${
+                              className={`w-3 h-3 sm:w-5 sm:h-5 ${
                                 isActive ? "text-white" : ""
                               }`}
                             />
                           )}
                         </div>
 
-                        <div className="text-left">
-                          <div className="font-semibold">{tab.name}</div>
+                        <div className="text-left hidden lg:block">
+                          <div className="font-semibold text-sm">{tab.name}</div>
                           <div
                             className={`text-xs ${
                               isActive ? "text-white/80" : "text-gray-500"
@@ -396,7 +396,7 @@ const ProcessPage = () => {
                       {/* Connector */}
                       {index < tabs.length - 1 && (
                         <div
-                          className={`w-8 h-0.5 ${
+                          className={`w-2 sm:w-4 lg:w-8 h-0.5 ${
                             getTabStatus(tabs[index + 1].id) === "completed"
                               ? "bg-success-300"
                               : "bg-gray-300"
@@ -410,7 +410,7 @@ const ProcessPage = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 overflow-hidden w-full max-w-full">
               <AnimatePresence mode="wait">
                 {activeTab === "upload" && (
                   <motion.div
@@ -418,7 +418,7 @@ const ProcessPage = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="p-8"
+                    className="p-4 sm:p-6 lg:p-8"
                   >
                     <VideoUpload />
                   </motion.div>
@@ -430,7 +430,7 @@ const ProcessPage = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="p-8"
+                    className="p-4 sm:p-6 lg:p-8"
                   >
                     <PromptInput
                       prompt={prompt}
@@ -448,7 +448,7 @@ const ProcessPage = () => {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="p-8"
+                    className="p-4 sm:p-6 lg:p-8"
                   >
                     <ProcessingStatus
                       job={currentJob}
@@ -466,13 +466,13 @@ const ProcessPage = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="w-full lg:col-span-4 space-y-4 lg:space-y-6 order-2 lg:order-none overflow-hidden">
             {/* Current Job Info */}
             {currentJob && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-4 lg:p-6 w-full max-w-full overflow-hidden"
               >
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                   <FileVideo className="w-5 h-5 mr-2 text-primary-600" />
@@ -482,7 +482,7 @@ const ProcessPage = () => {
                 <div className="space-y-3">
                   <div>
                     <div className="text-sm text-gray-500">Video</div>
-                    <div className="font-medium text-gray-900 truncate">
+                    <div className="font-medium text-gray-900 truncate text-sm sm:text-base break-all">
                       {currentJob.video_metadata?.filename || "Unknown"}
                     </div>
                   </div>
@@ -529,10 +529,10 @@ const ProcessPage = () => {
                   )}
 
                   {currentJob.video_metadata && (
-                    <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
-                      <div>
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-3 border-t border-gray-100">
+                      <div className="min-w-0">
                         <div className="text-xs text-gray-500">Duration</div>
-                        <div className="text-sm font-medium">
+                        <div className="text-xs sm:text-sm font-medium truncate">
                           {currentJob.video_metadata.duration
                             ? `${Math.round(
                                 currentJob.video_metadata.duration
@@ -540,11 +540,10 @@ const ProcessPage = () => {
                             : "Unknown"}
                         </div>
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="text-xs text-gray-500">Resolution</div>
-                        <div className="text-sm font-medium">
-                          {currentJob.video_metadata.width}x
-                          {currentJob.video_metadata.height}
+                        <div className="text-xs sm:text-sm font-medium truncate">
+                          {currentJob.video_metadata.width}×{currentJob.video_metadata.height}
                         </div>
                       </div>
                     </div>

@@ -490,7 +490,7 @@ const ToolsPage = () => {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6"
           >
             Video Processing Tools
           </motion.h1>
@@ -498,7 +498,7 @@ const ToolsPage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-600 max-w-3xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4"
           >
             Explore our comprehensive suite of 24+ professional video processing
             tools. Each tool is powered by OpenCV and optimized for quality and
@@ -508,9 +508,9 @@ const ToolsPage = () => {
 
         {/* Search and Filter */}
         <div className="mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6">
             {/* Search */}
-            <div className="relative flex-1 max-w-md">
+            <div className="relative flex-1 max-w-md w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
@@ -522,7 +522,7 @@ const ToolsPage = () => {
             </div>
 
             {/* Category Filter */}
-            <div className="flex items-center space-x-2 overflow-x-auto scrollbar-hide">
+            <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto scrollbar-hide pb-2 lg:pb-0">
               {categories.map((category) => {
                 const Icon = category.icon;
                 const isActive = selectedCategory === category.id;
@@ -531,7 +531,7 @@ const ToolsPage = () => {
                   <button
                     key={category.id}
                     onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all duration-200 ${
+                    className={`flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all duration-200 text-sm sm:text-base ${
                       isActive
                         ? "bg-primary-600 text-white shadow-lg"
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -540,7 +540,7 @@ const ToolsPage = () => {
                     <Icon className="w-4 h-4" />
                     <span>{category.name}</span>
                     <span
-                      className={`text-xs px-2 py-0.5 rounded-full ${
+                      className={`text-xs px-1.5 sm:px-2 py-0.5 rounded-full ${
                         isActive ? "bg-white/20" : "bg-white"
                       }`}
                     >
@@ -587,10 +587,10 @@ const ToolsPage = () => {
                     </div>
 
                     {/* Content */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">
                       {tool.name}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed mb-4">
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-4">
                       {tool.description}
                     </p>
 
@@ -609,7 +609,7 @@ const ToolsPage = () => {
                         Example Prompts:
                       </h4>
                       <div className="space-y-1">
-                        {tool.examples.slice(0, 2).map((example, index) => (
+                        {tool.examples.slice(0, 1).map((example, index) => (
                           <div
                             key={index}
                             className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded-lg"
@@ -658,10 +658,10 @@ const ToolsPage = () => {
           viewport={{ once: true }}
           className="text-center mt-16 p-8 bg-gradient-to-br from-primary-50 to-purple-50 rounded-3xl border border-primary-100"
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             Ready to Process Your Video?
           </h2>
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-base sm:text-lg text-gray-600 mb-6 px-4">
             Simply describe what you want, and our AI will automatically select
             and apply the perfect tools.
           </p>
@@ -669,7 +669,7 @@ const ToolsPage = () => {
             href="/process"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="btn-primary px-8 py-4 text-lg inline-flex items-center shadow-xl"
+            className="btn-primary px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg inline-flex items-center shadow-xl"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Start Processing
